@@ -1,0 +1,224 @@
+.povWrap {
+  --scene-viewport-height: min(90vh, 1200px);
+  position: relative;
+  border-radius: var(--radius);
+  border: 1px solid rgba(0, 255, 122, 0.18);
+  box-shadow: 0 14px 30px var(--shadow);
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: var(--scene-viewport-height);
+}
+
+.pov {
+  position: relative;
+  width: min(100%, calc(var(--scene-viewport-height) * (2 / 3)));
+  max-height: var(--scene-viewport-height);
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+}
+
+.sceneImage,
+.objectImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: contrast(1.08) saturate(0.95) brightness(0.92);
+}
+
+.objectImage {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.sceneDescriptionOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 16px 28px;
+  background: linear-gradient(
+    180deg,
+    rgba(4, 12, 8, 0.9) 0%,
+    rgba(4, 12, 8, 0.6) 70%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+.sceneDescriptionOverlayText {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  color: rgba(215, 255, 231, 0.9);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+  min-height: 1.2em;
+}
+
+.sceneActionsOverlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px 16px 16px;
+  background: linear-gradient(
+    0deg,
+    rgba(4, 12, 8, 0.95) 0%,
+    rgba(4, 12, 8, 0.7) 70%,
+    transparent 100%
+  );
+  z-index: 2;
+  pointer-events: none;
+}
+
+.sceneActionsList {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  pointer-events: auto;
+}
+
+.sceneActionsList::-webkit-scrollbar {
+  height: 6px;
+}
+
+.sceneActionsList::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 122, 0.35);
+  border-radius: 999px;
+}
+
+.sceneActionMenu {
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.sceneActionButton {
+  appearance: none;
+  border: 1px solid rgba(0, 255, 122, 0.45);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.55);
+  color: rgba(215, 255, 231, 0.95);
+  padding: 12px 16px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.sceneActionButton strong {
+  font-size: 0.95rem;
+}
+
+.sceneActionButton--menu {
+  flex: 0 0 auto;
+  padding: 12px;
+  width: 44px;
+}
+
+.sceneActionButton:focus-visible {
+  border-color: rgba(0, 255, 122, 0.9);
+  outline: none;
+}
+
+.hitbox {
+  position: absolute;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  display: block;
+  transition: transform 120ms ease, background 120ms ease,
+    border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.hitbox:hover,
+.hitbox:focus-visible {
+  transform: translateY(-1px);
+}
+
+.hitbox.selected {
+  border-color: rgba(0, 255, 122, 1);
+  background: rgba(0, 255, 122, 0.14);
+  box-shadow: 0 0 28px rgba(0, 255, 122, 0.35);
+}
+
+.tag {
+  position: absolute;
+  left: 8px;
+  top: -10px;
+  transform: translateY(-100%);
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  background: rgba(0, 25, 10, 0.85);
+  border: 1px solid rgba(0, 255, 122, 0.35);
+  color: rgba(215, 255, 231, 0.92);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.hitbox:not(.selected) .tag {
+  opacity: 0;
+}
+
+.sceneLoadingOverlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: rgba(3, 10, 6, 1);
+  color: rgba(211, 255, 233, 0.85);
+  z-index: 10;
+  pointer-events: none;
+}
+
+.sceneLoadingOverlay > span {
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+}
+
+.sceneLoadingSpinner {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 3px solid rgba(211, 255, 233, 0.35);
+  border-top-color: rgba(0, 255, 122, 0.9);
+  animation: sceneSpinner 1s linear infinite;
+}
+
+@keyframes sceneSpinner {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

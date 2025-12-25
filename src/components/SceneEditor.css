@@ -1,0 +1,435 @@
+.sceneEditorOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 8, 16, 0.92);
+  backdrop-filter: blur(10px);
+  padding: 24px;
+  z-index: 20;
+  overflow: auto;
+  color: #f5f7fb;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.sceneEditorShell {
+  margin: 0 auto;
+  max-width: 1600px;
+  min-height: calc(100vh - 48px);
+  background: radial-gradient(
+      85% 60% at 20% 0%,
+      rgba(22, 163, 74, 0.15),
+      rgba(3, 7, 18, 0)
+    ),
+    rgba(7, 11, 22, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 20px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sceneEditorHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.sceneEditorEyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.sceneEditorHeader h2 {
+  margin: 4px 0 0;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.sceneEditorHeaderControls {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.sceneEditorLabel {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sceneEditorSelect,
+.sceneEditorField input,
+.sceneEditorField textarea,
+.sceneEditorField select {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.04);
+  color: inherit;
+  font: inherit;
+  padding: 10px 12px;
+  outline: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.sceneEditorSelect:focus,
+.sceneEditorField input:focus,
+.sceneEditorField textarea:focus,
+.sceneEditorField select:focus {
+  border-color: rgba(34, 197, 94, 0.6);
+  background: rgba(34, 197, 94, 0.08);
+}
+
+.sceneEditorButton {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  border-radius: 12px;
+  padding: 9px 14px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.sceneEditorButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sceneEditorButton:not(:disabled):hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.sceneEditorButton--primary {
+  border-color: rgba(34, 197, 94, 0.6);
+  background: rgba(34, 197, 94, 0.18);
+}
+
+.sceneEditorButton--danger {
+  border-color: rgba(248, 113, 113, 0.6);
+  background: rgba(248, 113, 113, 0.18);
+  color: #ffecec;
+}
+
+.sceneEditorButton--ghost {
+  background: transparent;
+}
+
+.sceneEditorGrid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(420px, 1fr) 380px;
+  gap: 16px;
+  min-height: 0;
+}
+
+.sceneEditorPanel {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  background: rgba(2, 6, 18, 0.65);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.sceneEditorPanelHeader {
+  padding: 16px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sceneEditorPanelLabel {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+}
+
+.sceneEditorEmptyState {
+  margin: 0;
+  padding: 20px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 14px;
+}
+
+.sceneEditorStage {
+  --scene-editor-stage-height: min(70vh, 900px);
+  flex: 1;
+  padding: 16px;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.sceneEditorStageFrame {
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(4, 8, 18, 0.85);
+  padding: 10px;
+  display: inline-flex;
+  justify-content: center;
+  width: min(
+    100%,
+    calc(var(--scene-editor-stage-height) * (2 / 3) + 20px)
+  );
+}
+
+.sceneEditorStageImage {
+  position: relative;
+  display: block;
+  user-select: none;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.4);
+  width: min(100%, calc(var(--scene-editor-stage-height) * (2 / 3)));
+  max-height: var(--scene-editor-stage-height);
+  aspect-ratio: 2 / 3;
+}
+
+.sceneEditorStageImage img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  pointer-events: none;
+}
+
+.sceneEditorStageOverlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.sceneEditorStageObjectLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.sceneEditorStageObjectLayer img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.sceneEditorStageMessage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 16px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.sceneEditorRect {
+  position: absolute;
+  border: 2px solid rgba(34, 197, 94, 0.8);
+  border-radius: 10px;
+  background: rgba(34, 197, 94, 0.12);
+  pointer-events: auto;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 8px;
+  box-sizing: border-box;
+  cursor: grab;
+}
+
+.sceneEditorRect.is-selected {
+  border-color: rgba(59, 130, 246, 0.9);
+  background: rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+.sceneEditorRect span {
+  pointer-events: none;
+}
+
+.sceneEditorHandle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: rgba(0, 0, 0, 0.6);
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.sceneEditorHandle--nw {
+  left: -6px;
+  top: -6px;
+  cursor: nwse-resize;
+}
+
+.sceneEditorHandle--ne {
+  right: -6px;
+  top: -6px;
+  cursor: nesw-resize;
+}
+
+.sceneEditorHandle--sw {
+  left: -6px;
+  bottom: -6px;
+  cursor: nesw-resize;
+}
+
+.sceneEditorHandle--se {
+  right: -6px;
+  bottom: -6px;
+  cursor: nwse-resize;
+}
+
+.sceneEditorPanel--scroll {
+  overflow: hidden;
+}
+
+.sceneEditorDetails {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sceneEditorCopyStatus {
+  font-size: 12px;
+  color: rgba(34, 197, 94, 0.8);
+  min-height: 16px;
+}
+
+.sceneEditorFieldset {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 16px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sceneEditorFieldset legend {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 0 6px;
+}
+
+.sceneEditorField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+}
+
+.sceneEditorFieldsetRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.sceneEditorHint {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.sceneEditorField textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.sceneEditorBoundingGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.sceneEditorDetailsActions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.sceneEditorInteractions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sceneEditorInteractionsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.sceneEditorInteractionCard {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.sceneEditorPanel textarea {
+  font-family: "SFMono-Regular", "Consolas", "Liberation Mono", monospace;
+  font-size: 12px;
+}
+
+.sceneEditorEmptyStage {
+  flex: 1;
+  border-radius: 16px;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 14px;
+}
+
+@media (max-width: 1280px) {
+  .sceneEditorGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .sceneEditorPanel {
+    min-height: auto;
+  }
+
+  .sceneEditorStage {
+    min-height: 360px;
+  }
+}
