@@ -117,7 +117,7 @@ export const gameSpec: GameSpec = {
       actions: [
         {
           text: "Открыть глаза",
-          effects: [{ goto: "room_bed_view" }],
+          effects: [{ goto: "room_bed_view_ringing_alarm" }],
         },
       ],
       objects: [],
@@ -139,17 +139,17 @@ export const gameSpec: GameSpec = {
           actions: [
             {
               text: "Выключить будильник",
-              effects: [{ goto: "room_bed_view" }],
+              effects: [{ goto: "room_bed_view_muted_alarm" }],
             },
           ],
-          image: "objects/alarm_clock.png",
+          image: "scenes/alarm-ringing.png",
           visible: true,
         },
       ],
     },
     room_bed_view_muted_alarm: {
       title: "Будильник замолк",
-      image: "scenes/darkness.png",
+      image: "scenes/alarm-muted.png",
       actions: [
         {
           text: "Встать",

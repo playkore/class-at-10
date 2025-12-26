@@ -237,6 +237,8 @@ const App = () => {
     setIsMenuOpen(false);
   };
 
+  console.log('sceneId', sceneId);
+
   return (
     <>
       <div className="appStack">
