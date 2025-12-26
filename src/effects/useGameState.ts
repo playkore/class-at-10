@@ -69,10 +69,8 @@ export const useGameState = () => {
     loadStoredGameState(gameSpec)
   );
 
+  // Save game state to local storage on changes
   useEffect(() => {
-    if (typeof window === "undefined") {
-      return;
-    }
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(gameState));
     } catch (error) {
@@ -81,7 +79,9 @@ export const useGameState = () => {
   }, [gameState]);
 
   const applyGameAction = (actionId: string, choiceId?: string) => {
-    setGameState((oldState) => applyAction(oldState, gameSpec, actionId, choiceId));
+    setGameState((oldState) =>
+      applyAction(oldState, gameSpec, actionId, choiceId)
+    );
   };
 
   const resetGame = () => {
