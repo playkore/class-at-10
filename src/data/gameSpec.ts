@@ -340,16 +340,16 @@ export const gameSpec: GameSpec = {
     },
     room_desk_view: {
       title: "Комната, вид на стол",
-      image: "scenes/darkness.png",
+      image: "scenes/apartment-desk.png",
       objects: [
         {
           name: "Расписание занятий",
           description: "Моё расписание на сегодня",
           boundingBox: {
-            x: 0.3,
-            y: 0.2,
-            width: 0.4,
-            height: 0.4,
+            x: 0.24,
+            y: 0.12,
+            width: 0.14,
+            height: 0.16,
           },
           actions: [
             {
@@ -373,10 +373,10 @@ export const gameSpec: GameSpec = {
           name: "Ящик стола",
           description: "Выдвижной ящик стола со всяким хламом",
           boundingBox: {
-            x: 0.7,
-            y: 0.2,
-            width: 0.2,
-            height: 0.5,
+            x: 0.69,
+            y: 0.61,
+            width: 0.3,
+            height: 0.09,
           },
           actions: [
             {
@@ -411,10 +411,10 @@ export const gameSpec: GameSpec = {
           name: "Косметичка",
           description: "Моя косметичка",
           boundingBox: {
-            x: 0.1,
-            y: 0.2,
-            width: 0.2,
-            height: 0.4,
+            x: 0.56,
+            y: 0.42,
+            width: 0.34,
+            height: 0.13,
           },
           actions: [
             {
@@ -445,10 +445,10 @@ export const gameSpec: GameSpec = {
           name: "Тетрадь и ручка",
           description: "Моя тетрадь и ручка для записей",
           boundingBox: {
-            x: 0.4,
-            y: 0.7,
-            width: 0.2,
-            height: 0.2,
+            x: 0.17,
+            y: 0.38,
+            width: 0.13,
+            height: 0.09,
           },
           actions: [
             {
@@ -471,10 +471,10 @@ export const gameSpec: GameSpec = {
           name: "Россыпь монет",
           description: "Немного мелочи на столе",
           boundingBox: {
-            x: 0.6,
-            y: 0.7,
-            width: 0.2,
-            height: 0.2,
+            x: 0.14,
+            y: 0.3,
+            width: 0.11,
+            height: 0.05,
           },
           actions: [
             {
@@ -497,10 +497,10 @@ export const gameSpec: GameSpec = {
           name: "Ключи от дома",
           description: "Ключи от моей квартиры",
           boundingBox: {
-            x: 0.8,
-            y: 0.7,
-            width: 0.1,
-            height: 0.2,
+            x: 0.73,
+            y: 0.17,
+            width: 0.07,
+            height: 0.06,
           },
           actions: [
             {
@@ -523,10 +523,10 @@ export const gameSpec: GameSpec = {
           name: "Одежда",
           description: "Моя одежда на сегодня",
           boundingBox: {
-            x: 0.1,
-            y: 0.7,
-            width: 0.2,
-            height: 0.2,
+            x: 0,
+            y: 0.53,
+            width: 0.51,
+            height: 0.31,
           },
           actions: [
             {
@@ -540,7 +540,7 @@ export const gameSpec: GameSpec = {
               ],
             },
           ],
-          image: "objects/clothes.png",
+          image: "scenes/apartment-desk-clothes.png",
           visible: {
             not: "daily.is_dressed",
           },
