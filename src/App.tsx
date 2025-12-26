@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import SceneView, { type SceneInteraction } from "./components/SceneView";
+import DebugPanel from "./components/DebugPanel";
 import { gameSpec } from "./data/gameSpec";
 import type {
   ActionDef,
@@ -143,6 +144,7 @@ const App = () => {
   );
   const [selectedObjectId, setSelectedObjectId] = useState<string | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDebugOpen, setIsDebugOpen] = useState(false);
 
   const sceneId = gameState.currentStateId;
   const scene = gameSpec.states[sceneId];
@@ -278,12 +280,29 @@ const App = () => {
                 <button
                   type="button"
                   className="menuItem"
+                  onClick={() => {
+                    setIsDebugOpen(true);
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  Debug
+                </button>
+                <button
+                  type="button"
+                  className="menuItem"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Close
                 </button>
               </div>
             )}
+            <DebugPanel
+              isOpen={isDebugOpen}
+              onClose={() => setIsDebugOpen(false)}
+              gameState={gameState}
+              spec={gameSpec}
+              setGameState={setGameState}
+            />
           </section>
         </main>
       </div>
