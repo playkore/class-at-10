@@ -108,8 +108,6 @@ export const gameSpec: GameSpec = {
       },
     },
   },
-
-  //////////////////////////////////////// States ////////////////////////////////////////
   states: {
     darkness_start: {
       title: "Темнота",
@@ -117,7 +115,11 @@ export const gameSpec: GameSpec = {
       actions: [
         {
           text: "Открыть глаза",
-          effects: [{ goto: "room_bed_view_ringing_alarm" }],
+          effects: [
+            {
+              goto: "room_bed_view_ringing_alarm",
+            },
+          ],
         },
       ],
       objects: [],
@@ -131,15 +133,19 @@ export const gameSpec: GameSpec = {
           name: "Будильник",
           description: "Звонит, пора вставать",
           boundingBox: {
-            x: 0.7,
-            y: 0.8,
-            width: 0.2,
-            height: 0.2,
+            x: 0.2700646046538219,
+            y: 0.40604501362605533,
+            width: 0.5329712423532103,
+            height: 0.19268195071751187,
           },
           actions: [
             {
               text: "Выключить будильник",
-              effects: [{ goto: "room_bed_view_muted_alarm" }],
+              effects: [
+                {
+                  goto: "room_bed_view_muted_alarm",
+                },
+              ],
             },
           ],
           image: "scenes/alarm-ringing.png",
@@ -153,11 +159,19 @@ export const gameSpec: GameSpec = {
       actions: [
         {
           text: "Встать",
-          effects: [{ goto: "corridor" }],
+          effects: [
+            {
+              goto: "corridor",
+            },
+          ],
         },
         {
           text: "Закрыть глаза",
-          effects: [{ goto: "darkness_start" }],
+          effects: [
+            {
+              goto: "darkness_start",
+            },
+          ],
         },
       ],
       objects: [],
@@ -170,8 +184,22 @@ export const gameSpec: GameSpec = {
           id: "bathroom_door",
           name: "Дверь в ванную",
           description: "Ведёт в ванную комнату",
-          boundingBox: { x: 0.1, y: 0.3, width: 0.2, height: 0.4 },
-          actions: [{ text: "Открыть дверь", effects: [{ goto: "bathroom" }] }],
+          boundingBox: {
+            x: 0.20977073923732206,
+            y: 0.14510129018733442,
+            width: 0.25488536961866104,
+            height: 0.451226344977417,
+          },
+          actions: [
+            {
+              text: "Открыть дверь",
+              effects: [
+                {
+                  goto: "bathroom",
+                },
+              ],
+            },
+          ],
           image: "objects/door.png",
           visible: true,
         },
@@ -179,13 +207,30 @@ export const gameSpec: GameSpec = {
           id: "toilet_room_door",
           name: "Дверь в туалет",
           description: "Ведёт в туалет",
-          boundingBox: { x: 0.4, y: 0.3, width: 0.2, height: 0.4 },
+          boundingBox: {
+            x: 0.4987936653135899,
+            y: 0.14510129018733442,
+            width: 0.2420787833743068,
+            height: 0.4487869952165876,
+          },
           actions: [
             {
               text: "Открыть",
-              effects: [{ set: { "daily.used_toilet_home": true } }],
-              guard: { not: "daily.used_toilet_home" },
-              failed_effects: [{ message: "Я больше не хочу." }],
+              effects: [
+                {
+                  set: {
+                    "daily.used_toilet_home": true,
+                  },
+                },
+              ],
+              guard: {
+                not: "daily.used_toilet_home",
+              },
+              failed_effects: [
+                {
+                  message: "Я больше не хочу.",
+                },
+              ],
             },
           ],
           image: "objects/door.png",
@@ -195,33 +240,69 @@ export const gameSpec: GameSpec = {
       actions: [
         {
           text: "Вернуться в комнату",
-          effects: [{ goto: "room_desk_view" }],
+          effects: [
+            {
+              goto: "room_desk_view",
+            },
+          ],
         },
         {
           text: "Пойти на кухню",
-          effects: [{ goto: "kitchen" }],
+          effects: [
+            {
+              goto: "kitchen",
+            },
+          ],
         },
         {
           text: "Выйти на улицу",
           guards: [
             {
-              if: { not: "daily.has_keys" },
-              effects: [{ message: "А домой я как попаду? Ключи не взяла!" }],
+              if: {
+                not: "daily.has_keys",
+              },
+              effects: [
+                {
+                  message: "А домой я как попаду? Ключи не взяла!",
+                },
+              ],
             },
             {
-              if: { not: "daily.has_notebook" },
-              effects: [{ message: "А писать я в чем в институте буду?" }],
+              if: {
+                not: "daily.has_notebook",
+              },
+              effects: [
+                {
+                  message: "А писать я в чем в институте буду?",
+                },
+              ],
             },
             {
-              if: { not: "daily.is_dressed" },
-              effects: [{ message: "Как я на улицу пойду в таком виде?" }],
+              if: {
+                not: "daily.is_dressed",
+              },
+              effects: [
+                {
+                  message: "Как я на улицу пойду в таком виде?",
+                },
+              ],
             },
             {
-              if: { or: ["daily.has_pass", "daily.has_coins"] },
-              effects: [{ message: "Как я на трамвае поеду, зайцем?" }],
+              if: {
+                or: ["daily.has_pass", "daily.has_coins"],
+              },
+              effects: [
+                {
+                  message: "Как я на трамвае поеду, зайцем?",
+                },
+              ],
             },
           ],
-          effects: [{ goto: "tram_stop" }],
+          effects: [
+            {
+              goto: "tram_stop",
+            },
+          ],
         },
       ],
     },
@@ -231,7 +312,11 @@ export const gameSpec: GameSpec = {
       actions: [
         {
           text: "Выйти",
-          effects: [{ goto: "corridor" }],
+          effects: [
+            {
+              goto: "corridor",
+            },
+          ],
         },
         {
           text: "Умыться и почистить зубы",
@@ -246,7 +331,9 @@ export const gameSpec: GameSpec = {
                 "daily.makeup_on": false,
               },
             },
-            { goto: "bathroom" },
+            {
+              goto: "bathroom",
+            },
           ],
         },
       ],
@@ -268,8 +355,14 @@ export const gameSpec: GameSpec = {
             {
               text: "Посмотреть расписание",
               effects: [
-                { set: { "persistent.knows_schedule": true } },
-                { message: "Ага, сегодня у меня аудитория 404." },
+                {
+                  set: {
+                    "persistent.knows_schedule": true,
+                  },
+                },
+                {
+                  message: "Ага, сегодня у меня аудитория 404.",
+                },
               ],
             },
           ],
@@ -289,8 +382,14 @@ export const gameSpec: GameSpec = {
             {
               text: "Открыть ящик",
               effects: [
-                { message: "О, проездной нашелся!" },
-                { set: { "daily.has_pass": true } },
+                {
+                  message: "О, проездной нашелся!",
+                },
+                {
+                  set: {
+                    "daily.has_pass": true,
+                  },
+                },
               ],
               guards: [
                 {
@@ -330,7 +429,11 @@ export const gameSpec: GameSpec = {
               guards: [
                 {
                   if: "daily.makeup_on",
-                  effects: [{ message: "Я уже накрасилась." }],
+                  effects: [
+                    {
+                      message: "Я уже накрасилась.",
+                    },
+                  ],
                 },
               ],
             },
@@ -350,11 +453,19 @@ export const gameSpec: GameSpec = {
           actions: [
             {
               text: "Взять",
-              effects: [{ set: { "daily.has_notebook": true } }],
+              effects: [
+                {
+                  set: {
+                    "daily.has_notebook": true,
+                  },
+                },
+              ],
             },
           ],
           image: "objects/notebook.png",
-          visible: { not: "daily.has_notebook" },
+          visible: {
+            not: "daily.has_notebook",
+          },
         },
         {
           name: "Россыпь монет",
@@ -368,11 +479,19 @@ export const gameSpec: GameSpec = {
           actions: [
             {
               text: "Взять",
-              effects: [{ set: { "daily.has_coins": true } }],
+              effects: [
+                {
+                  set: {
+                    "daily.has_coins": true,
+                  },
+                },
+              ],
             },
           ],
           image: "objects/coins.png",
-          visible: { not: "daily.has_coins" },
+          visible: {
+            not: "daily.has_coins",
+          },
         },
         {
           name: "Ключи от дома",
@@ -386,11 +505,19 @@ export const gameSpec: GameSpec = {
           actions: [
             {
               text: "Взять",
-              effects: [{ set: { "daily.has_keys": true } }],
+              effects: [
+                {
+                  set: {
+                    "daily.has_keys": true,
+                  },
+                },
+              ],
             },
           ],
           image: "objects/keys.png",
-          visible: { not: "daily.has_keys" },
+          visible: {
+            not: "daily.has_keys",
+          },
         },
         {
           name: "Одежда",
@@ -404,17 +531,29 @@ export const gameSpec: GameSpec = {
           actions: [
             {
               text: "Одеться",
-              effects: [{ set: { "daily.is_dressed": true } }],
+              effects: [
+                {
+                  set: {
+                    "daily.is_dressed": true,
+                  },
+                },
+              ],
             },
           ],
           image: "objects/clothes.png",
-          visible: { not: "daily.is_dressed" },
+          visible: {
+            not: "daily.is_dressed",
+          },
         },
       ],
       actions: [
         {
           text: "В коридор",
-          effects: [{ goto: "corridor" }],
+          effects: [
+            {
+              goto: "corridor",
+            },
+          ],
         },
       ],
     },
@@ -434,7 +573,11 @@ export const gameSpec: GameSpec = {
           actions: [
             {
               text: "Зайти в трамвай",
-              effects: [{ goto: "tram_inside" }],
+              effects: [
+                {
+                  goto: "tram_inside",
+                },
+              ],
             },
           ],
           image: "objects/tram_doors.png",
@@ -460,7 +603,9 @@ export const gameSpec: GameSpec = {
               text: "Показать проездной",
               guards: [
                 {
-                  if: { not: "daily.has_pass" },
+                  if: {
+                    not: "daily.has_pass",
+                  },
                   effects: [
                     {
                       set: {
@@ -504,439 +649,14 @@ export const gameSpec: GameSpec = {
       actions: [
         {
           text: "Войти внутрь",
-          effects: [{ goto: "university_hall" }],
+          effects: [
+            {
+              goto: "university_hall",
+            },
+          ],
         },
       ],
     },
-    // university_hall: {
-    //   title: "Вестибюль университета",
-    //   image: "scenes/university_hall.png",
-    //   on_enter: {
-    //     message_if: [
-    //       {
-    //         if: {
-    //           "daily.talked_konstantin_today": true,
-    //         },
-    //         then: "Константина уже нет — он ушёл сдавать.",
-    //       },
-    //     ],
-    //   },
-    //   actions: {
-    //     go_toilet: {
-    //       text: "Туалет",
-    //       guard: [
-    //         { gte: ["loop.day_index", 2] },
-    //         { not: "daily.used_toilet_uni" },
-    //         { not: "daily.used_toilet_home" },
-    //       ],
-    //       on_fail: {
-    //         stay: true,
-    //         message_by_first_failed_guard: {
-    //           "loop.day_index":
-    //             "Сейчас ещё рано — уборщица не пускает. Придётся потерпеть.",
-    //           "daily.used_toilet_uni": "Я уже забегала сюда сегодня.",
-    //           "daily.used_toilet_home":
-    //             "Ладно, надо было сходить дома. Теперь поздно.",
-    //         },
-    //       },
-    //       goto: "uni_toilet",
-    //     },
-    //     go_room_404: {
-    //       text: "Аудитория 404",
-    //       guard: ["persistent.knows_schedule"],
-    //       on_fail: {
-    //         stay: true,
-    //         message: "Хм… Я ведь так и не посмотрела расписание.",
-    //       },
-    //       goto: "lecture_hall",
-    //     },
-    //     wait_in_corner: {
-    //       text: "Присесть в уголочке",
-    //       message: "Посижу, подожду ребят.",
-    //       goto: "university_hall_corner",
-    //     },
-    //     talk_konstantin: {
-    //       text: "Константин",
-    //       guard: [{ not: "daily.talked_konstantin_today" }],
-    //       effects: [
-    //         {
-    //           set: {
-    //             "daily.talked_konstantin_today": true,
-    //           },
-    //         },
-    //       ],
-    //       goto: "talk_konstantin",
-    //       on_fail: {
-    //         stay: true,
-    //         message: "Сегодня мы уже поговорили — он убежал сдавать.",
-    //       },
-    //     },
-    //     nap: {
-    //       text: "Подремать",
-    //       message: "Глаза предательски закрываются…",
-    //       goto: "sleep_next_day",
-    //     },
-    //   },
-    // },
-    // university_hall_corner: {
-    //   title: "Вестибюль: уголочек",
-    //   image: "scenes/university_hall_corner.png",
-    //   on_enter: {
-    //     message_if: [
-    //       {
-    //         if: {
-    //           "persistent.knows_schedule": false,
-    //         },
-    //         then: "Подожду наших… Всё равно я не знаю, в какой аудитории занятие.",
-    //       },
-    //       { else: "Подожду наших, пойдём вместе в аудиторию." },
-    //     ],
-    //   },
-    //   actions: {
-    //     stand_up: {
-    //       text: "Встать",
-    //       goto: "university_hall",
-    //     },
-    //     doze_off: {
-    //       text: "Подремать",
-    //       message: "Задремать прямо тут — плохая идея… но глаза закрываются.",
-    //       goto: "sleep_next_day",
-    //     },
-    //   },
-    // },
-    // talk_konstantin: {
-    //   title: "Диалог: Константин в вестибюле",
-    //   image: "scenes/university_hall_konstantin.png",
-    //   actions: {
-    //     greet: {
-    //       text: "Заговорить",
-    //       choices: [
-    //         {
-    //           id: "ask_call",
-    //           text: "А позвонить?",
-    //           goto: "konstantin_needs_change",
-    //         },
-    //         {
-    //           id: "do_nothing",
-    //           text: "Пожелать удачи и уйти",
-    //           goto: "university_hall",
-    //         },
-    //       ],
-    //     },
-    //   },
-    // },
-    // konstantin_needs_change: {
-    //   title: 'Константин: "У меня только пятерка. Не разменяешь?"',
-    //   image: "scenes/university_hall_konstantin_close.png",
-    //   actions: {
-    //     give_ruble: {
-    //       text: "Отдать рубль",
-    //       guard: ["daily.has_coins"],
-    //       on_fail: {
-    //         stay: true,
-    //         message: "Если бы… У меня совсем нет мелочи.",
-    //       },
-    //       effects: [
-    //         {
-    //           set: {
-    //             "persistent.lent_ruble": true,
-    //           },
-    //         },
-    //         {
-    //           set: {
-    //             "daily.has_coins": false,
-    //           },
-    //         },
-    //       ],
-    //       message: "Спасибо! Разменяю и обязательно верну.",
-    //       goto: "university_hall",
-    //     },
-    //     refuse: {
-    //       text: "Извини, я дома деньги оставила",
-    //       message:
-    //         "Жаль. Ладно, пойду один сдавать. Я уже и так опоздал… Пока!",
-    //       goto: "university_hall",
-    //     },
-    //     tell_friends_wont_come: {
-    //       text: "Они не придут (если слышала о тусовке)",
-    //       guard: ["persistent.met_konstantin_in_cafeteria"],
-    //       on_fail: {
-    //         stay: true,
-    //         message: "Откуда мне это знать? Надо сначала что-то услышать.",
-    //       },
-    //       effects: [
-    //         {
-    //           set: {
-    //             "persistent.told_friends_wont_come": true,
-    //           },
-    //         },
-    //       ],
-    //       goto: "konstantin_why_know",
-    //     },
-    //   },
-    // },
-    // konstantin_why_know: {
-    //   title: 'Константин: "Откуда ты знаешь?"',
-    //   image: "scenes/university_hall_konstantin_close.png",
-    //   actions: {
-    //     intuition: {
-    //       text: "Женская интуиция. Иди один сдавай.",
-    //       message: "Ладно, может ты и права… Пойду, пожалуй. Пока!",
-    //       goto: "university_hall",
-    //     },
-    //   },
-    // },
-    // uni_toilet: {
-    //   title: "Туалет (университет)",
-    //   image: "scenes/university_toilet.png",
-    //   actions: {
-    //     use: {
-    //       text: "Сходить",
-    //       guard: [{ not: "daily.used_toilet_uni" }],
-    //       on_fail: {
-    //         stay: true,
-    //         message: "Я уже заходила — больше не получится.",
-    //       },
-    //       effects: [
-    //         {
-    //           set: {
-    //             "daily.used_toilet_uni": true,
-    //           },
-    //         },
-    //       ],
-    //       message: "Готово. Можно идти дальше.",
-    //     },
-    //     inspect_notebook: {
-    //       text: "Забытая тетрадь",
-    //       goto: "natasha_notebook",
-    //     },
-    //     exit: {
-    //       text: "Выйти",
-    //       goto: "university_hall",
-    //     },
-    //   },
-    // },
-    // natasha_notebook: {
-    //   title: "Забытая тетрадь",
-    //   image: "scenes/natasha_notebook.png",
-    //   actions: {
-    //     look: {
-    //       text: "Посмотреть",
-    //       message: "Это тетрадь Наташи.",
-    //     },
-    //     take: {
-    //       text: "Взять",
-    //       guard: [{ not: "daily.found_natasha_notebook" }],
-    //       on_fail: {
-    //         stay: true,
-    //         message: "Уже лежит у меня в сумке.",
-    //       },
-    //       effects: [
-    //         {
-    //           set: {
-    //             "daily.found_natasha_notebook": true,
-    //           },
-    //         },
-    //       ],
-    //       message: "Возьму, вдруг пригодится.",
-    //       goto: "uni_toilet",
-    //     },
-    //     back: {
-    //       text: "Назад",
-    //       goto: "uni_toilet",
-    //     },
-    //   },
-    // },
-    // lecture_hall: {
-    //   title: "Аудитория",
-    //   image: "scenes/lecture_hall.png",
-    //   actions: {
-    //     sit_with_natasha: {
-    //       text: "Сесть к Наташе",
-    //       goto: "with_natasha",
-    //     },
-    //     sit_alone: {
-    //       text: "Сесть в одиночестве",
-    //       goto: "alone",
-    //     },
-    //   },
-    // },
-    // with_natasha: {
-    //   title: "Сидеть с Наташей",
-    //   image: "scenes/lecture_with_natasha.png",
-    //   actions: {
-    //     return_natasha_notebook: {
-    //       text: "Отдать тетрадь (если есть)",
-    //       guard: [
-    //         "daily.found_natasha_notebook",
-    //         { not: "daily.returned_natasha_notebook_today" },
-    //       ],
-    //       on_fail: {
-    //         stay: true,
-    //         message_by_first_failed_guard: {
-    //           "daily.found_natasha_notebook": "Нечего отдавать — пустые руки.",
-    //           "daily.returned_natasha_notebook_today":
-    //             "Я уже отдала её сегодня.",
-    //         },
-    //       },
-    //       effects: [
-    //         {
-    //           set: {
-    //             "daily.returned_natasha_notebook_today": true,
-    //           },
-    //         },
-    //         {
-    //           set: {
-    //             "persistent.natasha_owes": true,
-    //           },
-    //         },
-    //       ],
-    //       message: "Ой! Моя! Спасибо тебе!",
-    //     },
-    //     ask_copy_yesterday: {
-    //       text: "Попросить списать вчерашнюю лекцию",
-    //       guard: ["persistent.natasha_owes"],
-    //       on_fail: {
-    //         stay: true,
-    //         message: "Неудобно просить — я ей ещё ничем не помогла.",
-    //       },
-    //       if: {
-    //         guard: ["daily.returned_natasha_notebook_today"],
-    //         then: {
-    //           effects: [
-    //             {
-    //               set: {
-    //                 "daily.got_lecture_notebook_today": true,
-    //               },
-    //             },
-    //           ],
-    //           message: "Держи, вот моя другая тетрадь, там лекция.",
-    //         },
-    //         else: {
-    //           message: "Эх… я сегодня свою тетрадь забыла.",
-    //         },
-    //       },
-    //     },
-    //     go_cafeteria_half: {
-    //       text: "Пойти в буфет на полпары",
-    //       guard: [
-    //         "daily.got_lecture_notebook_today",
-    //         { not: "daily.went_to_cafeteria_today" },
-    //       ],
-    //       on_fail: {
-    //         stay: true,
-    //         message_by_first_failed_guard: {
-    //           "daily.got_lecture_notebook_today":
-    //             "Сначала бы списать лекцию — без тетради там делать нечего.",
-    //           "daily.went_to_cafeteria_today":
-    //             "Я уже прогуливала сегодня — второй раз нельзя.",
-    //         },
-    //       },
-    //       effects: [
-    //         {
-    //           set: {
-    //             "daily.went_to_cafeteria_today": true,
-    //           },
-    //         },
-    //       ],
-    //       message: "С Наташиным конспектом можно прогулять полпары.",
-    //       goto: "cafeteria",
-    //     },
-    //     doze_off: {
-    //       text: "Закрыть глаза, задремать",
-    //       message: "Складываю руки на парте и проваливаюсь в сон.",
-    //       goto: "sleep_next_day",
-    //     },
-    //   },
-    // },
-    // alone: {
-    //   title: "Сидеть в одиночестве",
-    //   image: "scenes/lecture_empty.png",
-    //   actions: {
-    //     doze_off: {
-    //       text: "Закрыть глаза, задремать",
-    //       message: "Скучно и клонит в сон.",
-    //       goto: "sleep_next_day",
-    //     },
-    //   },
-    // },
-    // cafeteria: {
-    //   title: "Буфет",
-    //   image: "scenes/cafeteria.png",
-    //   actions: {
-    //     talk_konstantin_if_lent: {
-    //       text: "Константин (вернуть рубль)",
-    //       guard: ["persistent.lent_ruble"],
-    //       on_fail: {
-    //         stay: true,
-    //         message: "Без рубля мы и не перекинулись бы словом.",
-    //       },
-    //       effects: [
-    //         {
-    //           set: {
-    //             "persistent.met_konstantin_in_cafeteria": true,
-    //           },
-    //         },
-    //       ],
-    //       message:
-    //         "О, хорошо, что ты тут! Я разменял пятерку, вот твой рубль… Дозвонился. Они не придут. Бухали вчера в общаге…",
-    //       goto: "cafeteria",
-    //     },
-    //     talk_konstantin_if_told: {
-    //       text: "Константин (спросить, как сдал)",
-    //       guard: ["persistent.told_friends_wont_come"],
-    //       on_fail: {
-    //         stay: true,
-    //         message: "Пока рано — он всё ещё переживает в вестибюле.",
-    //       },
-    //       goto: "cafeteria_true_ending_dialog",
-    //     },
-    //     return_to_hall: {
-    //       text: "Вернуться в вестибюль",
-    //       goto: "university_hall",
-    //     },
-    //     doze_off: {
-    //       text: "Сесть, задремать",
-    //       message: "В буфете тепло и сон клонит…",
-    //       goto: "sleep_next_day",
-    //     },
-    //   },
-    // },
-    // cafeteria_true_ending_dialog: {
-    //   title: "Буфет: развязка",
-    //   image: "scenes/cafeteria_true_ending.png",
-    //   actions: {
-    //     dialogue: {
-    //       text: "Заговорить",
-    //       message:
-    //         "— Ну как, сдал?\n— Сдал! Хорошо, что я тебя послушал, препод уходила уже, еле успел.\n— Я рада за тебя!\n— Знаешь, не поеду я в наш корпус. У меня пятерка есть, хочешь творожник с чаем?\n— Хочу.\n— Я Костя, кстати…\n— Я…\n",
-    //       goto: "true_ending",
-    //     },
-    //   },
-    // },
-    // sleep_next_day: {
-    //   title: "Темнота → следующий день",
-    //   image: "scenes/darkness.png",
-    //   on_enter: {
-    //     message: "…",
-    //   },
-    //   actions: {
-    //     open_eyes: {
-    //       text: "Открыть глаза",
-    //       effects: [
-    //         {
-    //           inc: {
-    //             "loop.day_index": 1,
-    //           },
-    //         },
-    //         {
-    //           reset: "daily_flags",
-    //         },
-    //       ],
-    //       goto: "darkness_start",
-    //     },
-    //   },
-    // },
   },
   terminals: {
     true_ending: {
@@ -950,3 +670,433 @@ export const gameSpec: GameSpec = {
     },
   },
 };
+
+// university_hall: {
+//   title: "Вестибюль университета",
+//   image: "scenes/university_hall.png",
+//   on_enter: {
+//     message_if: [
+//       {
+//         if: {
+//           "daily.talked_konstantin_today": true,
+//         },
+//         then: "Константина уже нет — он ушёл сдавать.",
+//       },
+//     ],
+//   },
+//   actions: {
+//     go_toilet: {
+//       text: "Туалет",
+//       guard: [
+//         { gte: ["loop.day_index", 2] },
+//         { not: "daily.used_toilet_uni" },
+//         { not: "daily.used_toilet_home" },
+//       ],
+//       on_fail: {
+//         stay: true,
+//         message_by_first_failed_guard: {
+//           "loop.day_index":
+//             "Сейчас ещё рано — уборщица не пускает. Придётся потерпеть.",
+//           "daily.used_toilet_uni": "Я уже забегала сюда сегодня.",
+//           "daily.used_toilet_home":
+//             "Ладно, надо было сходить дома. Теперь поздно.",
+//         },
+//       },
+//       goto: "uni_toilet",
+//     },
+//     go_room_404: {
+//       text: "Аудитория 404",
+//       guard: ["persistent.knows_schedule"],
+//       on_fail: {
+//         stay: true,
+//         message: "Хм… Я ведь так и не посмотрела расписание.",
+//       },
+//       goto: "lecture_hall",
+//     },
+//     wait_in_corner: {
+//       text: "Присесть в уголочке",
+//       message: "Посижу, подожду ребят.",
+//       goto: "university_hall_corner",
+//     },
+//     talk_konstantin: {
+//       text: "Константин",
+//       guard: [{ not: "daily.talked_konstantin_today" }],
+//       effects: [
+//         {
+//           set: {
+//             "daily.talked_konstantin_today": true,
+//           },
+//         },
+//       ],
+//       goto: "talk_konstantin",
+//       on_fail: {
+//         stay: true,
+//         message: "Сегодня мы уже поговорили — он убежал сдавать.",
+//       },
+//     },
+//     nap: {
+//       text: "Подремать",
+//       message: "Глаза предательски закрываются…",
+//       goto: "sleep_next_day",
+//     },
+//   },
+// },
+// university_hall_corner: {
+//   title: "Вестибюль: уголочек",
+//   image: "scenes/university_hall_corner.png",
+//   on_enter: {
+//     message_if: [
+//       {
+//         if: {
+//           "persistent.knows_schedule": false,
+//         },
+//         then: "Подожду наших… Всё равно я не знаю, в какой аудитории занятие.",
+//       },
+//       { else: "Подожду наших, пойдём вместе в аудиторию." },
+//     ],
+//   },
+//   actions: {
+//     stand_up: {
+//       text: "Встать",
+//       goto: "university_hall",
+//     },
+//     doze_off: {
+//       text: "Подремать",
+//       message: "Задремать прямо тут — плохая идея… но глаза закрываются.",
+//       goto: "sleep_next_day",
+//     },
+//   },
+// },
+// talk_konstantin: {
+//   title: "Диалог: Константин в вестибюле",
+//   image: "scenes/university_hall_konstantin.png",
+//   actions: {
+//     greet: {
+//       text: "Заговорить",
+//       choices: [
+//         {
+//           id: "ask_call",
+//           text: "А позвонить?",
+//           goto: "konstantin_needs_change",
+//         },
+//         {
+//           id: "do_nothing",
+//           text: "Пожелать удачи и уйти",
+//           goto: "university_hall",
+//         },
+//       ],
+//     },
+//   },
+// },
+// konstantin_needs_change: {
+//   title: 'Константин: "У меня только пятерка. Не разменяешь?"',
+//   image: "scenes/university_hall_konstantin_close.png",
+//   actions: {
+//     give_ruble: {
+//       text: "Отдать рубль",
+//       guard: ["daily.has_coins"],
+//       on_fail: {
+//         stay: true,
+//         message: "Если бы… У меня совсем нет мелочи.",
+//       },
+//       effects: [
+//         {
+//           set: {
+//             "persistent.lent_ruble": true,
+//           },
+//         },
+//         {
+//           set: {
+//             "daily.has_coins": false,
+//           },
+//         },
+//       ],
+//       message: "Спасибо! Разменяю и обязательно верну.",
+//       goto: "university_hall",
+//     },
+//     refuse: {
+//       text: "Извини, я дома деньги оставила",
+//       message:
+//         "Жаль. Ладно, пойду один сдавать. Я уже и так опоздал… Пока!",
+//       goto: "university_hall",
+//     },
+//     tell_friends_wont_come: {
+//       text: "Они не придут (если слышала о тусовке)",
+//       guard: ["persistent.met_konstantin_in_cafeteria"],
+//       on_fail: {
+//         stay: true,
+//         message: "Откуда мне это знать? Надо сначала что-то услышать.",
+//       },
+//       effects: [
+//         {
+//           set: {
+//             "persistent.told_friends_wont_come": true,
+//           },
+//         },
+//       ],
+//       goto: "konstantin_why_know",
+//     },
+//   },
+// },
+// konstantin_why_know: {
+//   title: 'Константин: "Откуда ты знаешь?"',
+//   image: "scenes/university_hall_konstantin_close.png",
+//   actions: {
+//     intuition: {
+//       text: "Женская интуиция. Иди один сдавай.",
+//       message: "Ладно, может ты и права… Пойду, пожалуй. Пока!",
+//       goto: "university_hall",
+//     },
+//   },
+// },
+// uni_toilet: {
+//   title: "Туалет (университет)",
+//   image: "scenes/university_toilet.png",
+//   actions: {
+//     use: {
+//       text: "Сходить",
+//       guard: [{ not: "daily.used_toilet_uni" }],
+//       on_fail: {
+//         stay: true,
+//         message: "Я уже заходила — больше не получится.",
+//       },
+//       effects: [
+//         {
+//           set: {
+//             "daily.used_toilet_uni": true,
+//           },
+//         },
+//       ],
+//       message: "Готово. Можно идти дальше.",
+//     },
+//     inspect_notebook: {
+//       text: "Забытая тетрадь",
+//       goto: "natasha_notebook",
+//     },
+//     exit: {
+//       text: "Выйти",
+//       goto: "university_hall",
+//     },
+//   },
+// },
+// natasha_notebook: {
+//   title: "Забытая тетрадь",
+//   image: "scenes/natasha_notebook.png",
+//   actions: {
+//     look: {
+//       text: "Посмотреть",
+//       message: "Это тетрадь Наташи.",
+//     },
+//     take: {
+//       text: "Взять",
+//       guard: [{ not: "daily.found_natasha_notebook" }],
+//       on_fail: {
+//         stay: true,
+//         message: "Уже лежит у меня в сумке.",
+//       },
+//       effects: [
+//         {
+//           set: {
+//             "daily.found_natasha_notebook": true,
+//           },
+//         },
+//       ],
+//       message: "Возьму, вдруг пригодится.",
+//       goto: "uni_toilet",
+//     },
+//     back: {
+//       text: "Назад",
+//       goto: "uni_toilet",
+//     },
+//   },
+// },
+// lecture_hall: {
+//   title: "Аудитория",
+//   image: "scenes/lecture_hall.png",
+//   actions: {
+//     sit_with_natasha: {
+//       text: "Сесть к Наташе",
+//       goto: "with_natasha",
+//     },
+//     sit_alone: {
+//       text: "Сесть в одиночестве",
+//       goto: "alone",
+//     },
+//   },
+// },
+// with_natasha: {
+//   title: "Сидеть с Наташей",
+//   image: "scenes/lecture_with_natasha.png",
+//   actions: {
+//     return_natasha_notebook: {
+//       text: "Отдать тетрадь (если есть)",
+//       guard: [
+//         "daily.found_natasha_notebook",
+//         { not: "daily.returned_natasha_notebook_today" },
+//       ],
+//       on_fail: {
+//         stay: true,
+//         message_by_first_failed_guard: {
+//           "daily.found_natasha_notebook": "Нечего отдавать — пустые руки.",
+//           "daily.returned_natasha_notebook_today":
+//             "Я уже отдала её сегодня.",
+//         },
+//       },
+//       effects: [
+//         {
+//           set: {
+//             "daily.returned_natasha_notebook_today": true,
+//           },
+//         },
+//         {
+//           set: {
+//             "persistent.natasha_owes": true,
+//           },
+//         },
+//       ],
+//       message: "Ой! Моя! Спасибо тебе!",
+//     },
+//     ask_copy_yesterday: {
+//       text: "Попросить списать вчерашнюю лекцию",
+//       guard: ["persistent.natasha_owes"],
+//       on_fail: {
+//         stay: true,
+//         message: "Неудобно просить — я ей ещё ничем не помогла.",
+//       },
+//       if: {
+//         guard: ["daily.returned_natasha_notebook_today"],
+//         then: {
+//           effects: [
+//             {
+//               set: {
+//                 "daily.got_lecture_notebook_today": true,
+//               },
+//             },
+//           ],
+//           message: "Держи, вот моя другая тетрадь, там лекция.",
+//         },
+//         else: {
+//           message: "Эх… я сегодня свою тетрадь забыла.",
+//         },
+//       },
+//     },
+//     go_cafeteria_half: {
+//       text: "Пойти в буфет на полпары",
+//       guard: [
+//         "daily.got_lecture_notebook_today",
+//         { not: "daily.went_to_cafeteria_today" },
+//       ],
+//       on_fail: {
+//         stay: true,
+//         message_by_first_failed_guard: {
+//           "daily.got_lecture_notebook_today":
+//             "Сначала бы списать лекцию — без тетради там делать нечего.",
+//           "daily.went_to_cafeteria_today":
+//             "Я уже прогуливала сегодня — второй раз нельзя.",
+//         },
+//       },
+//       effects: [
+//         {
+//           set: {
+//             "daily.went_to_cafeteria_today": true,
+//           },
+//         },
+//       ],
+//       message: "С Наташиным конспектом можно прогулять полпары.",
+//       goto: "cafeteria",
+//     },
+//     doze_off: {
+//       text: "Закрыть глаза, задремать",
+//       message: "Складываю руки на парте и проваливаюсь в сон.",
+//       goto: "sleep_next_day",
+//     },
+//   },
+// },
+// alone: {
+//   title: "Сидеть в одиночестве",
+//   image: "scenes/lecture_empty.png",
+//   actions: {
+//     doze_off: {
+//       text: "Закрыть глаза, задремать",
+//       message: "Скучно и клонит в сон.",
+//       goto: "sleep_next_day",
+//     },
+//   },
+// },
+// cafeteria: {
+//   title: "Буфет",
+//   image: "scenes/cafeteria.png",
+//   actions: {
+//     talk_konstantin_if_lent: {
+//       text: "Константин (вернуть рубль)",
+//       guard: ["persistent.lent_ruble"],
+//       on_fail: {
+//         stay: true,
+//         message: "Без рубля мы и не перекинулись бы словом.",
+//       },
+//       effects: [
+//         {
+//           set: {
+//             "persistent.met_konstantin_in_cafeteria": true,
+//           },
+//         },
+//       ],
+//       message:
+//         "О, хорошо, что ты тут! Я разменял пятерку, вот твой рубль… Дозвонился. Они не придут. Бухали вчера в общаге…",
+//       goto: "cafeteria",
+//     },
+//     talk_konstantin_if_told: {
+//       text: "Константин (спросить, как сдал)",
+//       guard: ["persistent.told_friends_wont_come"],
+//       on_fail: {
+//         stay: true,
+//         message: "Пока рано — он всё ещё переживает в вестибюле.",
+//       },
+//       goto: "cafeteria_true_ending_dialog",
+//     },
+//     return_to_hall: {
+//       text: "Вернуться в вестибюль",
+//       goto: "university_hall",
+//     },
+//     doze_off: {
+//       text: "Сесть, задремать",
+//       message: "В буфете тепло и сон клонит…",
+//       goto: "sleep_next_day",
+//     },
+//   },
+// },
+// cafeteria_true_ending_dialog: {
+//   title: "Буфет: развязка",
+//   image: "scenes/cafeteria_true_ending.png",
+//   actions: {
+//     dialogue: {
+//       text: "Заговорить",
+//       message:
+//         "— Ну как, сдал?\n— Сдал! Хорошо, что я тебя послушал, препод уходила уже, еле успел.\n— Я рада за тебя!\n— Знаешь, не поеду я в наш корпус. У меня пятерка есть, хочешь творожник с чаем?\n— Хочу.\n— Я Костя, кстати…\n— Я…\n",
+//       goto: "true_ending",
+//     },
+//   },
+// },
+// sleep_next_day: {
+//   title: "Темнота → следующий день",
+//   image: "scenes/darkness.png",
+//   on_enter: {
+//     message: "…",
+//   },
+//   actions: {
+//     open_eyes: {
+//       text: "Открыть глаза",
+//       effects: [
+//         {
+//           inc: {
+//             "loop.day_index": 1,
+//           },
+//         },
+//         {
+//           reset: "daily_flags",
+//         },
+//       ],
+//       goto: "darkness_start",
+//     },
+//   },
+// },

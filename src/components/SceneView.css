@@ -192,6 +192,14 @@
 
 .hitbox--edit .tag {
   opacity: 1;
+  top: -26px;
+  left: 6px;
+  transform: none;
+  z-index: 2;
+}
+
+.hitbox--edit:not(.selected) .tag {
+  opacity: 1 !important
 }
 
 .tag--visible {

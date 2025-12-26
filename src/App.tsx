@@ -57,11 +57,7 @@ const setValue = (state: GameState, path: ValuePath, value: any) => {
   state.variables[path as VarPath] = value;
 };
 
-const applyEffects = (
-  state: GameState,
-  spec: GameSpec,
-  effects?: Effect[]
-) => {
+const applyEffects = (state: GameState, spec: GameSpec, effects?: Effect[]) => {
   if (!effects) {
     return;
   }
@@ -247,10 +243,17 @@ const App = () => {
     setIsMenuOpen(false);
   };
 
+  const roundBox = (box: BoundingBox): BoundingBox => ({
+    x: Number(box.x.toFixed(2)),
+    y: Number(box.y.toFixed(2)),
+    width: Number(box.width.toFixed(2)),
+    height: Number(box.height.toFixed(2)),
+  });
+
   const handleBoundingBoxChange = (objectId: string, box: BoundingBox) => {
     setBoundingBoxOverrides((prev) => ({
       ...prev,
-      [objectId]: box,
+      [objectId]: roundBox(box),
     }));
   };
 
@@ -280,15 +283,11 @@ const App = () => {
     };
 
     try {
-      await navigator.clipboard.writeText(
-        JSON.stringify(updatedSpec, null, 2)
-      );
+      await navigator.clipboard.writeText(JSON.stringify(updatedSpec, null, 2));
     } catch (error) {
       console.warn("Failed to copy updated spec", error);
     }
   };
-
-  console.log('sceneId', sceneId);
 
   return (
     <>
@@ -325,7 +324,11 @@ const App = () => {
             )}
             {isMenuOpen && (
               <div className="appMenu" role="dialog" aria-label="Game menu">
-                <button type="button" className="menuItem" onClick={handleReset}>
+                <button
+                  type="button"
+                  className="menuItem"
+                  onClick={handleReset}
+                >
                   Restart
                 </button>
                 <button
