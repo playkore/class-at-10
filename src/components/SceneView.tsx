@@ -45,9 +45,9 @@ const SceneView = ({
     const target = event.target as HTMLElement;
     if (
       target.closest("button.hitbox") ||
-      target.closest("button.sceneActionButton")
+      target.closest(".sceneActionsOverlay")
     ) {
-      // Click was on an object or a button, do not deselect
+      // Click was on an object or an action element, do not deselect.
       return;
     }
     onObjectSelect(null);
