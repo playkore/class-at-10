@@ -64,6 +64,7 @@ type BooleanExpression =
 
 
 export interface SceneObject {
+  id?: string;
   name: string;
   description?: string;
   boundingBox: BoundingBox;
@@ -103,8 +104,12 @@ export interface ActionDef {
   text: string;
   // The action button visibility condition.
   visible?: BooleanExpression;
+  // Optional guard for a single conditional action (e.g. object actions).
+  guard?: BooleanExpression;
   // Effects to apply when the action is taken.
   effects: Effect[];
+  // Effects to apply when the guard fails.
+  failed_effects?: Effect[];
   // If none of the guards fail, the effects are applied.
   // Otherwise, the effects from the first failed guard are applied.
   guards?: Guard[];

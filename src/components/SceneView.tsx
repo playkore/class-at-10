@@ -1,28 +1,33 @@
 import type { MouseEvent as ReactMouseEvent, ReactNode } from "react";
-import type {
-  ObjectInteraction,
-  SceneDefinition,
-  SceneObject,
-} from "../types/scenes";
-import type { GameState } from "../effects/useGameState";
+import type { ActionDef, SceneObject, StateNode } from "../data/types";
+import type { GameState } from "../engine/gameEngine";
 import { useSceneAssetsLoading } from "../effects/useSceneAssetsLoading";
 import { resolveSceneImage } from "../utils/resolveSceneImage";
+import { evaluateExpression } from "../utils/evaluateExpression";
 import "./SceneView.css";
 import SceneDescriptionOverlay from "./SceneDescriptionOverlay";
 import TVStaticCanvas from "./TVStaticCanvas";
 
+export interface SceneInteraction {
+  id: string;
+  label: string;
+  action: ActionDef;
+}
+
 export interface SceneViewProps {
-  scene: SceneDefinition;
+  sceneId: string;
+  scene: StateNode;
   gameState: GameState;
   selectedObjectId: string | null;
   onObjectSelect: (sceneObject: SceneObject | null) => void;
   descriptionText: string | null;
-  interactions: ObjectInteraction[];
-  onInteractionSelect: (interaction: ObjectInteraction) => void;
+  interactions: SceneInteraction[];
+  onInteractionSelect: (interaction: SceneInteraction) => void;
   menuAction?: ReactNode;
 }
 
 const SceneView = ({
+  sceneId,
   scene,
   gameState,
   selectedObjectId,
@@ -35,11 +40,16 @@ const SceneView = ({
   const { isLoading, loadedCount, totalCount } = useSceneAssetsLoading(scene);
   const progressPercent =
     totalCount > 0 ? Math.round((loadedCount / totalCount) * 100) : 100;
-  const imageSrc = scene.imageSrc ? resolveSceneImage(scene.imageSrc) : null;
-  const objectsWithVisibility = scene.objects.map((sceneObject) => ({
-    sceneObject,
-    isVisible: sceneObject.visible ? sceneObject.visible(gameState) : true,
-  }));
+  const imageSrc = scene.image ? resolveSceneImage(scene.image) : null;
+  const objectsWithVisibility = (scene.objects ?? []).map(
+    (sceneObject, index) => ({
+      sceneObject: {
+        ...sceneObject,
+        id: sceneObject.id ?? `${sceneId}-object-${index}`,
+      },
+      isVisible: evaluateExpression(sceneObject.visible, gameState),
+    })
+  );
 
   const handleSceneClick = (event: ReactMouseEvent<HTMLDivElement>) => {
     const target = event.target as HTMLElement;
@@ -54,7 +64,7 @@ const SceneView = ({
   };
 
   return (
-    <div className="povWrap" aria-label={`Scene ${scene.name}`}>
+    <div className="povWrap" aria-label={`Scene ${scene.title ?? sceneId}`}>
       <div
         className={`pov${imageSrc ? "" : " pov--text-mode"}`}
         onClick={handleSceneClick}
@@ -62,22 +72,22 @@ const SceneView = ({
         aria-live="polite"
       >
         {imageSrc ? (
-          <img
-            className="sceneImage"
-            src={imageSrc}
-            alt={scene.description ?? scene.name}
-            draggable="false"
-          />
-        ) : (
+            <img
+              className="sceneImage"
+              src={imageSrc}
+              alt={scene.title ?? sceneId}
+              draggable="false"
+            />
+          ) : (
           <div className="sceneBackdrop" aria-hidden="true" />
         )}
         <SceneDescriptionOverlay text={descriptionText} />
         {(interactions.length > 0 || menuAction) && (
           <div className="sceneActionsOverlay">
             <div className="sceneActionsList" role="group">
-              {interactions.map((interaction, index) => (
+              {interactions.map((interaction) => (
                 <button
-                  key={`${scene.id}-interaction-${index}`}
+                  key={interaction.id}
                   type="button"
                   className="sceneActionButton"
                   onClick={() => onInteractionSelect(interaction)}
@@ -92,11 +102,11 @@ const SceneView = ({
           </div>
         )}
         {objectsWithVisibility.map(({ sceneObject, isVisible }) => {
-          if (!sceneObject.imageSrc || !isVisible) {
+          if (!sceneObject.image || !isVisible) {
             return null;
           }
 
-          const objectImageSrc = resolveSceneImage(sceneObject.imageSrc);
+          const objectImageSrc = resolveSceneImage(sceneObject.image);
           return (
             <img
               key={`object-image-${sceneObject.id}`}

@@ -1,4 +1,3 @@
-import { text } from "stream/consumers";
 import type { GameSpec } from "./types";
 
 export const gameSpec: GameSpec = {

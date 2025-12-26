@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import type { SceneDefinition } from "../types/scenes";
+import type { StateNode } from "../data/types";
 import { resolveSceneImage } from "../utils/resolveSceneImage";
 
 interface SceneAssetStatus {
@@ -20,7 +20,7 @@ const loadImage = (src: string) =>
     }
   });
 
-export const useSceneAssetsLoading = (scene: SceneDefinition) => {
+export const useSceneAssetsLoading = (scene: StateNode) => {
   const [status, setStatus] = useState<SceneAssetStatus>({
     isLoading: false,
     loadedCount: 0,
@@ -28,12 +28,12 @@ export const useSceneAssetsLoading = (scene: SceneDefinition) => {
   });
 
   const sources = useMemo(() => {
-    const baseSources = scene.imageSrc
-      ? [resolveSceneImage(scene.imageSrc)]
+    const baseSources = scene.image
+      ? [resolveSceneImage(scene.image)]
       : [];
-    const objectSources = scene.objects
-      .filter((object) => Boolean(object.imageSrc))
-      .map((object) => resolveSceneImage(object.imageSrc as string));
+    const objectSources = (scene.objects ?? [])
+      .filter((object) => Boolean(object.image))
+      .map((object) => resolveSceneImage(object.image));
 
     return [...baseSources, ...objectSources];
   }, [scene]);

@@ -151,8 +151,8 @@
 
 .sceneActionButton--menu {
   flex: 0 0 auto;
-  padding: 12px;
-  width: 44px;
+  padding: 8px;
+  width: 32px;
 }
 
 .sceneActionButton:focus-visible {
