@@ -346,10 +346,10 @@ export const gameSpec: GameSpec = {
           name: "Расписание занятий",
           description: "Моё расписание на сегодня",
           boundingBox: {
-            x: 0.24,
-            y: 0.12,
-            width: 0.14,
-            height: 0.16,
+            x: 0.18,
+            y: 0.16,
+            width: 0.23,
+            height: 0.14,
           },
           actions: [
             {
@@ -393,7 +393,8 @@ export const gameSpec: GameSpec = {
                   },
                   effects: [
                     {
-                      message: "Мне там ничего не нужно, там только хлам всякий.",
+                      message:
+                        "Мне там ничего не нужно, там только хлам всякий.",
                     },
                   ],
                 },
@@ -407,10 +408,10 @@ export const gameSpec: GameSpec = {
           name: "Косметичка",
           description: "Моя косметичка",
           boundingBox: {
-            x: 0.56,
-            y: 0.42,
-            width: 0.34,
-            height: 0.13,
+            x: 0.65,
+            y: 0.44,
+            width: 0.26,
+            height: 0.11,
           },
           actions: [
             {
@@ -561,10 +562,10 @@ export const gameSpec: GameSpec = {
           name: "Проездной",
           description: "Проездной лежит среди бумаг",
           boundingBox: {
-            x: 0.42,
-            y: 0.4,
-            width: 0.2,
-            height: 0.12,
+            x: 0.32,
+            y: 0.56,
+            width: 0.42,
+            height: 0.2,
           },
           actions: [
             {
