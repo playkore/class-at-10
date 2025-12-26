@@ -164,7 +164,7 @@ export const gameSpec: GameSpec = {
     },
     corridor: {
       title: "Коридор, вид на ванну с туалетом",
-      image: "scenes/darkness.png",
+      image: "scenes/corridor.png",
       objects: [
         {
           id: "bathroom_door",
