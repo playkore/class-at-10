@@ -383,21 +383,17 @@ export const gameSpec: GameSpec = {
               text: "Открыть ящик",
               effects: [
                 {
-                  message: "О, проездной нашелся!",
-                },
-                {
-                  set: {
-                    "daily.has_pass": true,
-                  },
+                  goto: "room_desk_drawer_open",
                 },
               ],
               guards: [
                 {
-                  if: "persistent.pass_unlocked",
+                  if: {
+                    not: "persistent.pass_unlocked",
+                  },
                   effects: [
                     {
-                      message:
-                        "Мне там ничего не нужно, там только хлам всякий.",
+                      message: "Мне там ничего не нужно, там только хлам всякий.",
                     },
                   ],
                 },
@@ -552,6 +548,51 @@ export const gameSpec: GameSpec = {
           effects: [
             {
               goto: "corridor",
+            },
+          ],
+        },
+      ],
+    },
+    room_desk_drawer_open: {
+      title: "Ящик стола",
+      image: "scenes/apartment-desk-drawer.png",
+      objects: [
+        {
+          name: "Проездной",
+          description: "Проездной лежит среди бумаг",
+          boundingBox: {
+            x: 0.42,
+            y: 0.4,
+            width: 0.2,
+            height: 0.12,
+          },
+          actions: [
+            {
+              text: "Забрать",
+              effects: [
+                {
+                  set: {
+                    "daily.has_pass": true,
+                  },
+                },
+                {
+                  message: "Проездной у меня.",
+                },
+              ],
+            },
+          ],
+          image: "scenes/apartment-desk-drawer-ticket.png",
+          visible: {
+            not: "daily.has_pass",
+          },
+        },
+      ],
+      actions: [
+        {
+          text: "Закрыть ящик",
+          effects: [
+            {
+              goto: "room_desk_view",
             },
           ],
         },
