@@ -11,7 +11,7 @@ import type {
   TerminalNode,
   ValuePath,
   VarPath,
-} from "../types/gameSpec";
+} from "../data/types";
 
 export type FlagState = Record<string, boolean>;
 export type VariableState = Record<VarPath, number | string | boolean>;

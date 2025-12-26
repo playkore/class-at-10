@@ -1,4 +1,5 @@
-import type { GameSpec } from "../types/gameSpec";
+import { text } from "stream/consumers";
+import type { GameSpec } from "./types";
 
 export const gameSpec: GameSpec = {
   meta: {
@@ -108,58 +109,133 @@ export const gameSpec: GameSpec = {
       },
     },
   },
+
+  //////////////////////////////////////// States ////////////////////////////////////////
   states: {
     darkness_start: {
       title: "Темнота",
       image: "scenes/darkness.png",
-      actions: {
-        open_eyes: {
+      actions: [
+        {
           text: "Открыть глаза",
-          goto: "room_bed_view",
+          effects: [{ goto: "room_bed_view" }],
         },
-      },
+      ],
+      objects: [],
     },
-    room_bed_view: {
-      title: "Вид с кровати",
+    room_bed_view_ringing_alarm: {
+      title: "Будильник звонит",
       image: "scenes/darkness.png",
-      actions: {
-        get_up: {
+      objects: [
+        {
+          id: "alarm_clock",
+          name: "Будильник",
+          description: "Звонит, пора вставать",
+          boundingBox: {
+            x: 0.7,
+            y: 0.8,
+            width: 0.2,
+            height: 0.2,
+          },
+          actions: [
+            {
+              text: "Выключить будильник",
+              effects: [{ goto: "room_bed_view" }],
+            },
+          ],
+          image: "objects/alarm_clock.png",
+          visible: true,
+        },
+      ],
+    },
+    room_bed_view_muted_alarm: {
+      title: "Будильник замолк",
+      image: "scenes/darkness.png",
+      actions: [
+        {
           text: "Встать",
-          goto: "corridor",
+          effects: [{ goto: "corridor" }],
         },
-        close_eyes: {
+        {
           text: "Закрыть глаза",
-          goto: "darkness_start",
+          effects: [{ goto: "darkness_start" }],
         },
-      },
+      ],
+      objects: [],
     },
     corridor: {
       title: "Коридор, вид на ванну с туалетом",
       image: "scenes/darkness.png",
-      actions: {
-        go_to_toilet: {
-          text: "Сходить в туалет",
-          guard: [
-            {
-              not: "daily.used_toilet_home",
-            },
-          ],
-          effects: [
-            {
-              set: {
-                "daily.used_toilet_home": true,
-              },
-            },
-          ],
-          goto: "bathroom",
+      objects: [
+        {
+          id: "bathroom_door",
+          name: "Дверь в ванную",
+          description: "Ведёт в ванную комнату",
+          boundingBox: { x: 0.1, y: 0.3, width: 0.2, height: 0.4 },
+          actions: [{ text: "Открыть дверь", effects: [{ goto: "bathroom" }] }],
+          image: "objects/door.png",
+          visible: true,
         },
-        wash_teeth: {
-          text: "Умыться и почистить зубы",
-          guard: [
+        {
+          id: "toilet_room_door",
+          name: "Дверь в туалет",
+          description: "Ведёт в туалет",
+          boundingBox: { x: 0.4, y: 0.3, width: 0.2, height: 0.4 },
+          actions: [
             {
-              not: "daily.washed_face",
+              text: "Открыть",
+              effects: [{ set: { "daily.used_toilet_home": true } }],
+              guard: { not: "daily.used_toilet_home" },
+              failed_effects: [{ message: "Я больше не хочу." }],
             },
           ],
+          image: "objects/door.png",
+          visible: true,
+        },
+      ],
+      actions: [
+        {
+          text: "Вернуться в комнату",
+          effects: [{ goto: "room_desk_view" }],
+        },
+        {
+          text: "Пойти на кухню",
+          effects: [{ goto: "kitchen" }],
+        },
+        {
+          text: "Выйти на улицу",
+          guards: [
+            {
+              if: { not: "daily.has_keys" },
+              effects: [{ message: "А домой я как попаду? Ключи не взяла!" }],
+            },
+            {
+              if: { not: "daily.has_notebook" },
+              effects: [{ message: "А писать я в чем в институте буду?" }],
+            },
+            {
+              if: { not: "daily.is_dressed" },
+              effects: [{ message: "Как я на улицу пойду в таком виде?" }],
+            },
+            {
+              if: { or: ["daily.has_pass", "daily.has_coins"] },
+              effects: [{ message: "Как я на трамвае поеду, зайцем?" }],
+            },
+          ],
+          effects: [{ goto: "tram_stop" }],
+        },
+      ],
+    },
+    bathroom: {
+      title: "Ванная",
+      image: "scenes/darkness.png",
+      actions: [
+        {
+          text: "Выйти",
+          effects: [{ goto: "corridor" }],
+        },
+        {
+          text: "Умыться и почистить зубы",
           effects: [
             {
               set: {
@@ -171,196 +247,172 @@ export const gameSpec: GameSpec = {
                 "daily.makeup_on": false,
               },
             },
+            { goto: "bathroom" },
           ],
-          goto: "bathroom",
         },
-        back_to_room: {
-          text: "Вернуться в комнату",
-          goto: "room_desk_view",
-        },
-        go_kitchen: {
-          text: "Пойти на кухню",
-          goto: "kitchen",
-        },
-        go_outside: {
-          text: "Выйти на улицу",
-          guard: [
-            "daily.has_keys",
-            "daily.has_notebook",
-            "daily.is_dressed",
-            {
-              any: ["daily.has_pass", "daily.has_coins"],
-            },
-          ],
-          on_fail: {
-            stay: true,
-            message_by_first_failed_guard: {
-              "daily.has_keys": "А домой я как попаду? Ключи не взяла!",
-              "daily.has_notebook": "А писать я в чем в институте буду?",
-              "daily.is_dressed": "Как я на улицу пойду в таком виде?",
-              transport: "Как я на трамвае поеду, зайцем?",
-            },
-          },
-          goto: "tram_stop",
-        },
-      },
-    },
-    bathroom: {
-      title: "Ванная",
-      image: "scenes/darkness.png",
-      actions: {
-        exit: {
-          text: "Выйти",
-          goto: "corridor",
-        },
-      },
+      ],
     },
     room_desk_view: {
       title: "Комната, вид на стол",
       image: "scenes/darkness.png",
-      actions: {
-        check_schedule: {
-          text: "Посмотреть расписание",
-          effects: [
+      objects: [
+        {
+          name: "Расписание занятий",
+          description: "Моё расписание на сегодня",
+          boundingBox: {
+            x: 0.3,
+            y: 0.2,
+            width: 0.4,
+            height: 0.4,
+          },
+          actions: [
             {
-              set: {
-                "persistent.knows_schedule": true,
-              },
+              text: "Посмотреть расписание",
+              effects: [
+                { set: { "persistent.knows_schedule": true } },
+                { message: "Ага, сегодня у меня аудитория 404." },
+              ],
             },
           ],
-          note: "Показывает: сегодня аудитория 404",
+          image: "objects/schedule.png",
+          visible: true,
         },
-        put_makeup: {
-          text: "Накраситься",
-          guard: [
+        {
+          name: "Ящик стола",
+          description: "Выдвижной ящик стола со всяким хламом",
+          boundingBox: {
+            x: 0.7,
+            y: 0.2,
+            width: 0.2,
+            height: 0.5,
+          },
+          actions: [
             {
-              not: "daily.makeup_on",
+              text: "Открыть ящик",
+              effects: [
+                { message: "О, проездной нашелся!" },
+                { set: { "daily.has_pass": true } },
+              ],
+              guards: [
+                {
+                  if: "persistent.pass_unlocked",
+                  effects: [{ message: "Мне там ничего не нужно, там только хлам всякий." }],
+                },
+              ],
             },
           ],
-          effects: [
-            {
-              set: {
-                "daily.makeup_on": true,
-              },
-            },
-          ],
+          image: "objects/wardrobe.png",
+          visible: true,
         },
-        take_notebook: {
-          text: "Взять тетрадь и ручку",
-          guard: [
+        {
+          name: "Косметичка",
+          description: "Моя косметичка",
+          boundingBox: {
+            x: 0.1,
+            y: 0.2,
+            width: 0.2,
+            height: 0.4,
+          },
+          actions: [
             {
-              not: "daily.has_notebook",
+              text: "Накраситься",
+              effects: [
+                {
+                  set: {
+                    "daily.makeup_on": true,
+                  },
+                },
+              ],
+              guards: [
+                {
+                  if: "daily.makeup_on",
+                  effects: [{ message: "Я уже накрасилась." }],
+                },
+              ],
             },
           ],
-          effects: [
-            {
-              set: {
-                "daily.has_notebook": true,
-              },
-            },
-          ],
+          image: "objects/makeup_bag.png",
+          visible: true,
         },
-        take_coins: {
-          text: "Взять россыпь монет",
-          guard: [
+        {
+          name: "Тетрадь и ручка",
+          description: "Моя тетрадь и ручка для записей",
+          boundingBox: {
+            x: 0.4,
+            y: 0.7,
+            width: 0.2,
+            height: 0.2,
+          },
+          actions: [
             {
-              not: "daily.has_coins",
+              text: "Взять",
+              effects: [{ set: { "daily.has_notebook": true } }],
             },
           ],
-          effects: [
-            {
-              set: {
-                "daily.has_coins": true,
-              },
-            },
-          ],
+          image: "objects/notebook.png",
+          visible: { not: "daily.has_notebook" },
         },
-        take_keys: {
-          text: "Взять ключи",
-          guard: [
+        {
+          name: "Россыпь монет",
+          description: "Немного мелочи на столе",
+          boundingBox: {
+            x: 0.6,
+            y: 0.7,
+            width: 0.2,
+            height: 0.2,
+          },
+          actions: [
             {
-              not: "daily.has_keys",
+              text: "Взять",
+              effects: [{ set: { "daily.has_coins": true } }],
             },
           ],
-          effects: [
-            {
-              set: {
-                "daily.has_keys": true,
-              },
-            },
-          ],
+          image: "objects/coins.png",
+          visible: { not: "daily.has_coins" },
         },
-        dress_up: {
-          text: "Одеться",
-          guard: [
+        {
+          name: "Ключи от дома",
+          description: "Ключи от моей квартиры",
+          boundingBox: {
+            x: 0.8,
+            y: 0.7,
+            width: 0.1,
+            height: 0.2,
+          },
+          actions: [
             {
-              not: "daily.is_dressed",
+              text: "Взять",
+              effects: [{ set: { "daily.has_keys": true } }],
             },
           ],
-          effects: [
+          image: "objects/keys.png",
+          visible: { not: "daily.has_keys" },
+        },
+        {
+          name: "Одежда",
+          description: "Моя одежда на сегодня",
+          boundingBox: {
+            x: 0.1,
+            y: 0.7,
+            width: 0.2,
+            height: 0.2,
+          },
+          actions: [
             {
-              set: {
-                "daily.is_dressed": true,
-              },
+              text: "Одеться",
+              effects: [{ set: { "daily.is_dressed": true } }],
             },
           ],
-        },
-        open_wardrobe: {
-          text: "Открыть шкаф",
-          guard: ["persistent.pass_unlocked"],
-          goto: "wardrobe_open",
-        },
-        go_corridor: {
+          image: "objects/clothes.png",
+          visible: { not: "daily.is_dressed" },
+        }
+      ],
+      actions: [
+        {
           text: "В коридор",
-          goto: "corridor",
+          effects: [{ goto: "corridor" }],
         },
-      },
-    },
-    wardrobe_open: {
-      title: "Открытый шкаф",
-      image: "scenes/darkness.png",
-      actions: {
-        take_pass: {
-          text: "Взять проездной",
-          guard: [
-            {
-              not: "daily.has_pass",
-            },
-          ],
-          effects: [
-            {
-              set: {
-                "daily.has_pass": true,
-              },
-            },
-          ],
-        },
-        close: {
-          text: "Закрыть шкаф",
-          goto: "room_desk_view",
-        },
-      },
-    },
-    kitchen: {
-      title: "Кухня",
-      image: "scenes/darkness.png",
-      actions: {
-        eat_yogurt: {
-          text: "Съесть йогурт",
-          guard: ["daily.is_hungry"],
-          effects: [
-            {
-              set: {
-                "daily.is_hungry": false,
-              },
-            },
-          ],
-        },
-        go_corridor: {
-          text: "В коридор",
-          goto: "corridor",
-        },
-      },
+      ],
     },
     tram_stop: {
       title: "Улица, остановка. Трамвай остановился, открыл двери",

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { ActionDef, GameSpec } from "../types/gameSpec";
+import type { ActionDef, GameSpec } from "../data/types";
 import {
   applyAction,
   buildActionLabel,

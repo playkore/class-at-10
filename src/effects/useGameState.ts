@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import type { GameSpec, StateId, VarPath } from "../types/gameSpec";
-import { gameSpec } from "../data/gameSpec";
+import type { GameSpec, StateId, VarPath } from "../data/types";
 import {
   applyAction,
   createInitialGameState,

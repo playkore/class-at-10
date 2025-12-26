@@ -1,6 +1,5 @@
 // Core JSON schema types for the loop-game DSL.
 export type StateId = string;
-export type ActionId = string;
 export type ChoiceId = string;
 
 export type FlagNamespace = "persistent" | "daily";
@@ -29,6 +28,7 @@ export interface LoopMeta {
   variables?: Record<VarPath, VariableSpec>;
 }
 
+export type Value = boolean | string | number;
 export type VariableType = "int" | "float" | "string" | "bool";
 
 export interface VariableSpec {
@@ -46,11 +46,37 @@ export interface FlagSpec {
   initial: boolean;
 }
 
+export interface BoundingBox {
+  //  Normalized coordinate from the left edge (0-1).
+  x: number;
+  // Normalized coordinate from the top edge (0-1).
+  y: number;
+  width: number;
+  height: number;
+}
+
+type BooleanExpression =
+  | { and: BooleanExpression[] }
+  | { or: BooleanExpression[] }
+  | { not: BooleanExpression }
+  | boolean
+  | ValuePath;
+
+
+export interface SceneObject {
+  name: string;
+  description?: string;
+  boundingBox: BoundingBox;
+  actions: ActionDef[];
+  image: string;
+  visible?: BooleanExpression;
+}
 export interface StateNode {
   title: string;
   image: string;
   on_enter?: OnEnter;
-  actions: Record<ActionId, ActionDef>;
+  actions?: ActionDef[];
+  objects?: SceneObject[];
 }
 
 export interface TerminalNode {
@@ -58,25 +84,30 @@ export interface TerminalNode {
   effects?: Effect[];
 }
 
-export interface OnEnter {
-  message?: string;
-  message_if?: MessageIfItem[];
+export interface ConditionalMessage {
+  message: string;
+  visible: BooleanExpression;
 }
 
-export type MessageIfItem =
-  | { if: Record<ValuePath, any>; then: string }
-  | { else: string };
+export interface OnEnter {
+  messages: ConditionalMessage[];
+}
+
+type Guard = {
+  if: BooleanExpression;
+  effects: Effect[];
+}
 
 export interface ActionDef {
-  text?: string;
-  goto?: StateId;
-  note?: string;
-  guard?: Guard[];
-  on_fail?: OnFail;
-  effects?: Effect[];
-  if?: IfThenElse;
-  choices?: ChoiceDef[];
-  message?: string;
+  // The action button text.
+  text: string;
+  // The action button visibility condition.
+  visible?: BooleanExpression;
+  // Effects to apply when the action is taken.
+  effects: Effect[];
+  // If none of the guards fail, the effects are applied.
+  // Otherwise, the effects from the first failed guard are applied.
+  guards?: Guard[];
 }
 
 export interface ChoiceDef {
@@ -94,22 +125,22 @@ export interface OnFail {
 }
 
 export interface IfThenElse {
-  guard: Guard[];
   then: { effects?: Effect[]; message?: string };
   else?: { effects?: Effect[]; message?: string };
 }
 
-export type Guard =
-  | ValuePath
-  | { flag: string }
-  | { not_flag: string }
-  | { not: Guard }
-  | { gte: [ValuePath | number, number] }
-  | { any: Guard[] };
+// export type Guard =
+//   | ValuePath
+//   | { flag: string }
+//   | { not_flag: string }
+//   | { not: Guard }
+//   | { gte: [ValuePath | number, number] }
+//   | { any: Guard[] };
 
 export type Effect =
-  | { noop: true }
   | { set: Record<ValuePath, any> }
   | { inc: Record<VarPath, number> }
   | { reset: "daily_flags" | "persistent_flags" }
-  | { end: true };
+  | { end: true }
+  | { message: string }
+  | { goto: StateId };
