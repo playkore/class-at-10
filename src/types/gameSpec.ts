@@ -48,6 +48,7 @@ export interface FlagSpec {
 
 export interface StateNode {
   title: string;
+  image: string;
   on_enter?: OnEnter;
   actions: Record<ActionId, ActionDef>;
 }

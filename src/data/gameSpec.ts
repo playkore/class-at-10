@@ -111,6 +111,7 @@ export const gameSpec: GameSpec = {
   states: {
     darkness_start: {
       title: "Темнота",
+      image: "scenes/darkness.png",
       actions: {
         open_eyes: {
           text: "Открыть глаза",
@@ -120,6 +121,7 @@ export const gameSpec: GameSpec = {
     },
     room_bed_view: {
       title: "Вид с кровати",
+      image: "scenes/darkness.png",
       actions: {
         get_up: {
           text: "Встать",
@@ -133,6 +135,7 @@ export const gameSpec: GameSpec = {
     },
     corridor: {
       title: "Коридор, вид на ванну с туалетом",
+      image: "scenes/darkness.png",
       actions: {
         go_to_toilet: {
           text: "Сходить в туалет",
@@ -204,6 +207,7 @@ export const gameSpec: GameSpec = {
     },
     bathroom: {
       title: "Ванная",
+      image: "scenes/darkness.png",
       actions: {
         exit: {
           text: "Выйти",
@@ -213,6 +217,7 @@ export const gameSpec: GameSpec = {
     },
     room_desk_view: {
       title: "Комната, вид на стол",
+      image: "scenes/darkness.png",
       actions: {
         check_schedule: {
           text: "Посмотреть расписание",
@@ -313,6 +318,7 @@ export const gameSpec: GameSpec = {
     },
     wardrobe_open: {
       title: "Открытый шкаф",
+      image: "scenes/darkness.png",
       actions: {
         take_pass: {
           text: "Взять проездной",
@@ -337,6 +343,7 @@ export const gameSpec: GameSpec = {
     },
     kitchen: {
       title: "Кухня",
+      image: "scenes/darkness.png",
       actions: {
         eat_yogurt: {
           text: "Съесть йогурт",
@@ -357,6 +364,7 @@ export const gameSpec: GameSpec = {
     },
     tram_stop: {
       title: "Улица, остановка. Трамвай остановился, открыл двери",
+      image: "scenes/darkness.png",
       actions: {
         board_tram: {
           text: "Сесть в трамвай",
@@ -366,6 +374,7 @@ export const gameSpec: GameSpec = {
     },
     tram_inside: {
       title: "В трамвае, виден кондуктор",
+      image: "scenes/darkness.png",
       actions: {
         show_pass: {
           text: "Показать проездной",
@@ -395,6 +404,7 @@ export const gameSpec: GameSpec = {
     },
     university_outside: {
       title: "Университет, на улице",
+      image: "scenes/darkness.png",
       actions: {
         enter: {
           text: "Войти",
@@ -404,6 +414,7 @@ export const gameSpec: GameSpec = {
     },
     university_hall: {
       title: "Вестибюль университета",
+      image: "scenes/darkness.png",
       on_enter: {
         message_if: [
           {
@@ -463,6 +474,7 @@ export const gameSpec: GameSpec = {
     },
     university_hall_corner: {
       title: "Вестибюль: уголочек",
+      image: "scenes/darkness.png",
       on_enter: {
         message_if: [
           {
@@ -489,6 +501,7 @@ export const gameSpec: GameSpec = {
     },
     talk_konstantin: {
       title: "Диалог: Константин в вестибюле",
+      image: "scenes/darkness.png",
       actions: {
         greet: {
           text: "Заговорить",
@@ -509,6 +522,7 @@ export const gameSpec: GameSpec = {
     },
     konstantin_needs_change: {
       title: "Константин: 'У меня только пятерка. Не разменяешь?'",
+      image: "scenes/darkness.png",
       actions: {
         give_ruble: {
           text: "Отдать рубль (если есть мелочь)",
@@ -550,6 +564,7 @@ export const gameSpec: GameSpec = {
     },
     konstantin_why_know: {
       title: "Константин: 'Откуда ты знаешь?'",
+      image: "scenes/darkness.png",
       actions: {
         intuition: {
           text: "Женская интуиция. Иди один сдавай.",
@@ -560,6 +575,7 @@ export const gameSpec: GameSpec = {
     },
     uni_toilet: {
       title: "Туалет (университет)",
+      image: "scenes/darkness.png",
       actions: {
         use: {
           text: "Сходить",
@@ -583,6 +599,7 @@ export const gameSpec: GameSpec = {
     },
     natasha_notebook: {
       title: "Забытая тетрадь",
+      image: "scenes/darkness.png",
       actions: {
         look: {
           text: "Посмотреть",
@@ -612,6 +629,7 @@ export const gameSpec: GameSpec = {
     },
     lecture_hall: {
       title: "Аудитория",
+      image: "scenes/darkness.png",
       actions: {
         sit_with_natasha: {
           text: "Сесть к Наташе",
@@ -625,6 +643,7 @@ export const gameSpec: GameSpec = {
     },
     with_natasha: {
       title: "Сидеть с Наташей",
+      image: "scenes/darkness.png",
       actions: {
         return_natasha_notebook: {
           text: "Отдать тетрадь (если есть)",
@@ -693,6 +712,7 @@ export const gameSpec: GameSpec = {
     },
     alone: {
       title: "Сидеть в одиночестве",
+      image: "scenes/darkness.png",
       actions: {
         doze_off: {
           text: "Закрыть глаза, задремать",
@@ -702,6 +722,7 @@ export const gameSpec: GameSpec = {
     },
     cafeteria: {
       title: "Буфет",
+      image: "scenes/darkness.png",
       actions: {
         talk_konstantin_if_lent: {
           text: "Константин (если дала ему рубль)",
@@ -730,6 +751,7 @@ export const gameSpec: GameSpec = {
     },
     cafeteria_true_ending_dialog: {
       title: "Буфет: развязка",
+      image: "scenes/darkness.png",
       actions: {
         dialogue: {
           text: "Заговорить",
@@ -741,6 +763,7 @@ export const gameSpec: GameSpec = {
     },
     sleep_next_day: {
       title: "Темнота → следующий день",
+      image: "scenes/darkness.png",
       on_enter: {
         message: "…",
       },
@@ -765,6 +788,7 @@ export const gameSpec: GameSpec = {
   terminals: {
     true_ending: {
       title: "Конец",
+      image: "scenes/darkness.png",
       effects: [
         {
           end: true,
