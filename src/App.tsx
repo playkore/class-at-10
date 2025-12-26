@@ -4,6 +4,7 @@ import DebugPanel from "./components/DebugPanel";
 import { gameSpec } from "./data/gameSpec";
 import type {
   ActionDef,
+  BoundingBox,
   Effect,
   GameSpec,
   ValuePath,
@@ -145,6 +146,10 @@ const App = () => {
   const [selectedObjectId, setSelectedObjectId] = useState<string | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDebugOpen, setIsDebugOpen] = useState(false);
+  const [editBoundingBoxes, setEditBoundingBoxes] = useState(false);
+  const [boundingBoxOverrides, setBoundingBoxOverrides] = useState<
+    Record<string, BoundingBox>
+  >({});
 
   const sceneId = gameState.currentStateId;
   const scene = gameSpec.states[sceneId];
@@ -154,8 +159,11 @@ const App = () => {
     return objects.map((sceneObject, index) => ({
       ...sceneObject,
       id: sceneObject.id ?? `${sceneId}-object-${index}`,
+      boundingBox:
+        boundingBoxOverrides[sceneObject.id ?? `${sceneId}-object-${index}`] ??
+        sceneObject.boundingBox,
     }));
-  }, [scene?.objects, sceneId]);
+  }, [scene?.objects, sceneId, boundingBoxOverrides]);
 
   const visibleSceneObjects = useMemo(
     () =>
@@ -239,6 +247,47 @@ const App = () => {
     setIsMenuOpen(false);
   };
 
+  const handleBoundingBoxChange = (objectId: string, box: BoundingBox) => {
+    setBoundingBoxOverrides((prev) => ({
+      ...prev,
+      [objectId]: box,
+    }));
+  };
+
+  const handleCopySpec = async () => {
+    const updatedStates = Object.fromEntries(
+      Object.entries(gameSpec.states).map(([stateId, stateNode]) => {
+        if (!stateNode.objects || stateNode.objects.length === 0) {
+          return [stateId, stateNode];
+        }
+        const objects = stateNode.objects.map((sceneObject, index) => {
+          const objectId = sceneObject.id ?? `${stateId}-object-${index}`;
+          const override = boundingBoxOverrides[objectId];
+          if (!override) {
+            return sceneObject;
+          }
+          return {
+            ...sceneObject,
+            boundingBox: { ...override },
+          };
+        });
+        return [stateId, { ...stateNode, objects }];
+      })
+    );
+    const updatedSpec = {
+      ...gameSpec,
+      states: updatedStates,
+    };
+
+    try {
+      await navigator.clipboard.writeText(
+        JSON.stringify(updatedSpec, null, 2)
+      );
+    } catch (error) {
+      console.warn("Failed to copy updated spec", error);
+    }
+  };
+
   console.log('sceneId', sceneId);
 
   return (
@@ -270,6 +319,8 @@ const App = () => {
                     <span className="menuTriggerDots" aria-hidden="true" />
                   </button>
                 }
+                editBoundingBoxes={editBoundingBoxes}
+                onBoundingBoxChange={handleBoundingBoxChange}
               />
             )}
             {isMenuOpen && (
@@ -302,6 +353,9 @@ const App = () => {
               gameState={gameState}
               spec={gameSpec}
               setGameState={setGameState}
+              editBoundingBoxes={editBoundingBoxes}
+              onToggleEditBoundingBoxes={setEditBoundingBoxes}
+              onCopySpec={handleCopySpec}
             />
           </section>
         </main>

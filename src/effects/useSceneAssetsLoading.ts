@@ -27,6 +27,11 @@ export const useSceneAssetsLoading = (scene: StateNode) => {
     totalCount: 0,
   });
 
+  const sourceKey = [
+    scene.image ?? "",
+    ...(scene.objects ?? []).map((object) => object.image ?? ""),
+  ].join("|");
+
   const sources = useMemo(() => {
     const baseSources = scene.image
       ? [resolveSceneImage(scene.image)]
@@ -36,7 +41,7 @@ export const useSceneAssetsLoading = (scene: StateNode) => {
       .map((object) => resolveSceneImage(object.image));
 
     return [...baseSources, ...objectSources];
-  }, [scene]);
+  }, [sourceKey]);
 
   useEffect(() => {
     let isActive = true;
@@ -92,7 +97,7 @@ export const useSceneAssetsLoading = (scene: StateNode) => {
     return () => {
       isActive = false;
     };
-  }, [scene, sources]);
+  }, [sources]);
 
   return status;
 };

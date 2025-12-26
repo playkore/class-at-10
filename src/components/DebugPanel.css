@@ -34,6 +34,12 @@
   border-bottom: 1px solid rgba(0, 255, 122, 0.12);
 }
 
+.debugHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .debugHeader h2 {
   margin: 6px 0 0;
   font-size: 1.1rem;
@@ -58,10 +64,42 @@
   transition: border-color 120ms ease, background 120ms ease;
 }
 
+.debugCopy {
+  border: 1px solid rgba(0, 255, 122, 0.35);
+  background: rgba(0, 0, 0, 0.35);
+  color: rgba(215, 255, 231, 0.9);
+  border-radius: 999px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
 .debugClose:hover,
 .debugClose:focus-visible {
   border-color: rgba(0, 255, 122, 0.8);
   background: rgba(0, 255, 122, 0.15);
+}
+
+.debugCopy:hover,
+.debugCopy:focus-visible {
+  border-color: rgba(0, 255, 122, 0.8);
+  background: rgba(0, 255, 122, 0.15);
+}
+
+.debugToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(215, 255, 231, 0.75);
+}
+
+.debugToggle input {
+  width: 18px;
+  height: 18px;
 }
 
 .debugSection {

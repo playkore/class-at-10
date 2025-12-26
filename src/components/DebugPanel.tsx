@@ -9,6 +9,9 @@ type DebugPanelProps = {
   gameState: GameState;
   spec: GameSpec;
   setGameState: Dispatch<SetStateAction<GameState>>;
+  editBoundingBoxes: boolean;
+  onToggleEditBoundingBoxes: (nextValue: boolean) => void;
+  onCopySpec: () => void;
 };
 
 const getVariableInputType = (
@@ -30,6 +33,9 @@ const DebugPanel = ({
   gameState,
   spec,
   setGameState,
+  editBoundingBoxes,
+  onToggleEditBoundingBoxes,
+  onCopySpec,
 }: DebugPanelProps) => {
   if (!isOpen) {
     return null;
@@ -95,9 +101,26 @@ const DebugPanel = ({
             <p className="debugEyebrow">Debug</p>
             <h2>Game state</h2>
           </div>
-          <button type="button" className="debugClose" onClick={onClose}>
-            Close
-          </button>
+          <div className="debugHeaderActions">
+            <label className="debugToggle">
+              <span>Edit Bounding Boxes</span>
+              <input
+                type="checkbox"
+                checked={editBoundingBoxes}
+                onChange={(event) =>
+                  onToggleEditBoundingBoxes(event.target.checked)
+                }
+              />
+            </label>
+            {editBoundingBoxes && (
+              <button type="button" className="debugCopy" onClick={onCopySpec}>
+                Copy
+              </button>
+            )}
+            <button type="button" className="debugClose" onClick={onClose}>
+              Close
+            </button>
+          </div>
         </header>
 
         <div className="debugBody">
