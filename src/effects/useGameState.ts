@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { GameSpec, StateId, VarPath } from "../data/types";
+import type { GameSpec, VarPath } from "../data/types";
 import {
   applyAction,
   createInitialGameState,
@@ -8,52 +8,18 @@ import {
 
 export type { GameState } from "../engine/gameEngine";
 
-const STORAGE_KEY = "winter-1999/game-state";
+const STORAGE_KEY = "class-at-10/game-state";
 
-const isValidStateId = (stateId: unknown, spec: GameSpec): stateId is StateId =>
-  typeof stateId === "string" &&
-  (stateId in spec.states || Boolean(spec.terminals?.[stateId]));
 
 const loadStoredGameState = (spec: GameSpec): GameState => {
-  if (typeof window === "undefined") {
-    return createInitialGameState(spec);
-  }
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
       return createInitialGameState(spec);
     }
-    const parsed = JSON.parse(raw) as Partial<GameState>;
-    const defaults = createInitialGameState(spec);
-    return {
-      ...defaults,
-      ...parsed,
-      currentStateId: isValidStateId(parsed?.currentStateId, spec)
-        ? parsed.currentStateId
-        : defaults.currentStateId,
-      flags: {
-        persistent: {
-          ...defaults.flags.persistent,
-          ...(parsed?.flags?.persistent ?? {}),
-        },
-        daily: {
-          ...defaults.flags.daily,
-          ...(parsed?.flags?.daily ?? {}),
-        },
-      },
-      variables: {
-        ...defaults.variables,
-        ...(parsed?.variables ?? {}),
-      },
-      message:
-        typeof parsed?.message === "string" || parsed?.message === null
-          ? parsed?.message ?? null
-          : defaults.message,
-      isEnded:
-        typeof parsed?.isEnded === "boolean"
-          ? parsed?.isEnded
-          : defaults.isEnded,
-    };
+    const parsed = JSON.parse(raw) as GameState;
+    // TODO Validate loaded state
+    return parsed;
   } catch (error) {
     console.warn("Failed to parse saved game state", error);
     return createInitialGameState(spec);
@@ -63,15 +29,15 @@ const loadStoredGameState = (spec: GameSpec): GameState => {
 const getLoopVar = (state: GameState, key: VarPath) =>
   state.variables[key] as number | string | boolean | undefined;
 
-export const useGameState = () => {
+export const useGameState = (spec: GameSpec) => {
   const [gameState, setGameState] = useState<GameState>(() =>
-    loadStoredGameState(gameSpec)
+    loadStoredGameState(spec)
   );
 
   // Save game state to local storage on changes
   useEffect(() => {
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(gameState));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(gameState));
     } catch (error) {
       console.warn("Failed to store game state", error);
     }
@@ -79,12 +45,12 @@ export const useGameState = () => {
 
   const applyGameAction = (actionId: string, choiceId?: string) => {
     setGameState((oldState) =>
-      applyAction(oldState, gameSpec, actionId, choiceId)
+      applyAction(oldState, spec, actionId, choiceId)
     );
   };
 
   const resetGame = () => {
-    setGameState(createInitialGameState(gameSpec));
+    setGameState(createInitialGameState(spec));
   };
 
   const resetMessage = () => {
