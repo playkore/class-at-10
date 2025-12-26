@@ -1,73 +1,142 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import SceneView from "./components/SceneView";
-import SceneEditor from "./components/SceneEditor";
-import { scenes } from "./data/scenes";
+import { gameSpec } from "./data/gameSpec";
+import { buildSceneDefinition, getActionEntries } from "./engine/sceneAdapter";
 import { useGameState } from "./effects/useGameState";
-import type {
-  ObjectInteraction,
-  SceneDefinition,
-  SceneObject,
-} from "./types/scenes";
+import type { ObjectInteraction, SceneObject } from "./types/scenes";
 import "./App.css";
 
 const App = () => {
   const [selectedObjectId, setSelectedObjectId] = useState<string | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isSceneEditorOpen, setIsSceneEditorOpen] = useState(false);
-  const { executeEffect, gameState, resetGame, resetMessage } = useGameState();
+  const [choiceActionId, setChoiceActionId] = useState<string | null>(null);
+  const { applyGameAction, gameState, getLoopVar, resetGame, resetMessage } =
+    useGameState();
   const menuWrapperRef = useRef<HTMLDivElement | null>(null);
 
-  const sceneMap = useMemo(() => {
-    return new Map<string, SceneDefinition>(
-      scenes.map((scene) => [scene.id, scene])
-    );
-  }, []);
+  const currentScene = useMemo(
+    () =>
+      buildSceneDefinition(gameState.currentStateId, gameSpec, gameState),
+    [gameState]
+  );
 
-  const currentScene = sceneMap.get(gameState.currentSceneId);
+  const actionEntries = useMemo(
+    () => getActionEntries(gameState.currentStateId, gameSpec, gameState),
+    [gameState]
+  );
+
+  const actionEntryMap = useMemo(() => {
+    return new Map(actionEntries.map((entry) => [entry.id, entry]));
+  }, [actionEntries]);
+
+  const activeAction = choiceActionId
+    ? actionEntryMap.get(choiceActionId) ?? null
+    : null;
+
+  const availableInteractions = useMemo<ObjectInteraction[]>(() => {
+    if (gameState.isEnded) {
+      return [];
+    }
+
+    if (activeAction?.action.choices?.length) {
+      const choiceInteractions = activeAction.action.choices.map((choice) => ({
+        label: choice.text,
+        kind: "action" as const,
+        actionId: activeAction.id,
+        choiceId: choice.id,
+      }));
+      return [
+        ...choiceInteractions,
+        {
+          label: "Назад",
+          kind: "ui",
+          uiAction: "back",
+        },
+      ];
+    }
+
+    return actionEntries
+      .filter((entry) => entry.isVisible || entry.isLocked)
+      .map((entry) => ({
+        label: entry.label,
+        kind: entry.action.choices ? "menu" : "action",
+        actionId: entry.id,
+      }));
+  }, [actionEntries, activeAction, gameState.isEnded]);
+
   const selectedObject: SceneObject | null =
-    currentScene?.objects.find((object) => object.id === selectedObjectId) ??
+    currentScene.objects.find((object) => object.id === selectedObjectId) ??
     null;
 
-  const availableInteractions =
-    (selectedObject
-      ? selectedObject.interactions
-      : currentScene?.interactions) ?? [];
-
+  const dayIndex = getLoopVar(gameState, "loop.day_index");
+  const baseDescription =
+    typeof dayIndex === "number"
+      ? `${currentScene.description ?? currentScene.name} · День ${dayIndex}`
+      : currentScene.description ?? currentScene.name;
   const sceneDescriptionText =
     gameState.message && gameState.message.trim() !== ""
       ? gameState.message
-      : selectedObject
-      ? selectedObject.description
-      : currentScene?.description ?? null;
+      : selectedObject?.description ?? baseDescription ?? null;
 
   useEffect(() => {
-    if (!currentScene || !selectedObjectId) {
+    if (!selectedObjectId) {
       return;
     }
-
     const activeObject = currentScene.objects.find(
       (object) => object.id === selectedObjectId
     );
-
-    const isVisible = activeObject?.visible
+    if (!activeObject) {
+      setSelectedObjectId(null);
+      return;
+    }
+    const isVisible = activeObject.visible
       ? activeObject.visible(gameState)
-      : Boolean(activeObject);
-
+      : true;
     if (!isVisible) {
       setSelectedObjectId(null);
     }
   }, [currentScene, selectedObjectId, gameState]);
 
+  useEffect(() => {
+    setChoiceActionId(null);
+  }, [gameState.currentStateId]);
+
+  useEffect(() => {
+    if (choiceActionId && !actionEntryMap.has(choiceActionId)) {
+      setChoiceActionId(null);
+    }
+  }, [choiceActionId, actionEntryMap]);
+
   const handleObjectSelect = (object: SceneObject | null) => {
     setSelectedObjectId(object?.id ?? null);
+    if (!object) {
+      resetMessage();
+      return;
+    }
+    const interaction = object.interactions[0];
+    if (interaction?.autoRun) {
+      handleInteraction(interaction);
+      setSelectedObjectId(null);
+      return;
+    }
     resetMessage();
   };
 
   const handleInteraction = (interaction: ObjectInteraction) => {
-    if (!currentScene) {
+    if (interaction.kind === "ui" && interaction.uiAction === "back") {
+      setChoiceActionId(null);
       return;
     }
-    executeEffect(interaction);
+    if (interaction.kind === "menu") {
+      setChoiceActionId(interaction.actionId ?? null);
+      resetMessage();
+      return;
+    }
+    if (interaction.kind !== "action" || !interaction.actionId) {
+      return;
+    }
+    applyGameAction(interaction.actionId, interaction.choiceId);
+    setChoiceActionId(null);
   };
 
   const handleMenuToggle = () => {
@@ -78,15 +147,6 @@ const App = () => {
     setSelectedObjectId(null);
     resetGame();
     setIsMenuOpen(false);
-  };
-
-  const handleOpenSceneEditor = () => {
-    setIsSceneEditorOpen(true);
-    setIsMenuOpen(false);
-  };
-
-  const handleCloseSceneEditor = () => {
-    setIsSceneEditorOpen(false);
   };
 
   useEffect(() => {
@@ -135,37 +195,10 @@ const App = () => {
           <button type="button" className="menuItem" onClick={handleNewGame}>
             New game
           </button>
-          <button
-            type="button"
-            className="menuItem"
-            onClick={handleOpenSceneEditor}
-          >
-            DEV: edit current scene
-          </button>
         </div>
       )}
     </div>
   );
-
-  if (!currentScene) {
-    return (
-      <>
-        <div className="appStack">
-          <main className="appShell">
-            <section className="panel">
-              <p>No scenes registered yet. Add one in src/data/scenes.ts.</p>
-            </section>
-          </main>
-        </div>
-        {isSceneEditorOpen && (
-          <SceneEditor
-            initialSceneId={gameState.currentSceneId}
-            onClose={handleCloseSceneEditor}
-          />
-        )}
-      </>
-    );
-  }
 
   return (
     <>
@@ -185,12 +218,6 @@ const App = () => {
           </section>
         </main>
       </div>
-      {isSceneEditorOpen && (
-        <SceneEditor
-          initialSceneId={gameState.currentSceneId}
-          onClose={handleCloseSceneEditor}
-        />
-      )}
     </>
   );
 };

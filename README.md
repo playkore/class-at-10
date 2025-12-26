@@ -50,7 +50,7 @@ builds the site on pushes to `main` (and on manual dispatches) and publishes the
 
 The Vite config automatically derives the correct `base` path from the repository
 name when `GITHUB_REPOSITORY` is available (e.g., inside Actions), so links will
-work both locally (`/`) and on Pages (`/eve-hunter-adventure/`).
+work both locally (`/`) and on Pages (`/class-at-10/`).
 
 ## Next steps
 

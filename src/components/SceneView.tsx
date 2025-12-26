@@ -35,7 +35,7 @@ const SceneView = ({
   const { isLoading, loadedCount, totalCount } = useSceneAssetsLoading(scene);
   const progressPercent =
     totalCount > 0 ? Math.round((loadedCount / totalCount) * 100) : 100;
-  const imageSrc = resolveSceneImage(scene.imageSrc);
+  const imageSrc = scene.imageSrc ? resolveSceneImage(scene.imageSrc) : null;
   const objectsWithVisibility = scene.objects.map((sceneObject) => ({
     sceneObject,
     isVisible: sceneObject.visible ? sceneObject.visible(gameState) : true,
@@ -56,17 +56,21 @@ const SceneView = ({
   return (
     <div className="povWrap" aria-label={`Scene ${scene.name}`}>
       <div
-        className="pov"
+        className={`pov${imageSrc ? "" : " pov--text-mode"}`}
         onClick={handleSceneClick}
         aria-busy={isLoading}
         aria-live="polite"
       >
-        <img
-          className="sceneImage"
-          src={imageSrc}
-          alt={scene.description ?? scene.name}
-          draggable="false"
-        />
+        {imageSrc ? (
+          <img
+            className="sceneImage"
+            src={imageSrc}
+            alt={scene.description ?? scene.name}
+            draggable="false"
+          />
+        ) : (
+          <div className="sceneBackdrop" aria-hidden="true" />
+        )}
         <SceneDescriptionOverlay text={descriptionText} />
         {(interactions.length > 0 || menuAction) && (
           <div className="sceneActionsOverlay">

@@ -1,89 +1,73 @@
 import { useEffect, useState } from "react";
-import { initialSceneId, type SceneId } from "../data/scenes";
-import { ObjectInteraction } from "../types/scenes";
-import { InventoryItemId } from "../types/inventory";
-import { defaultFlagsState, FlagsState } from "../types/flags";
-import { GameStateWrapper } from "./gameStateWrapper";
+import type { GameSpec, StateId, VarPath } from "../types/gameSpec";
+import { gameSpec } from "../data/gameSpec";
+import {
+  applyAction,
+  createInitialGameState,
+  type GameState,
+} from "../engine/gameEngine";
 
-export type GameStateLook = "neutral" | "happy" | "angry";
+export type { GameState } from "../engine/gameEngine";
 
-export type GameState = {
-  currentSceneId: SceneId;
-  chairFixed: boolean;
-  hasDuctTape: boolean;
-  inventory: InventoryItemId[];
-  flags: FlagsState;
-  message: string | null;
-  look: GameStateLook;
-  score: number;
-};
+const STORAGE_KEY = "winter-1999/game-state";
 
-const createInitialGameState = (): GameState => ({
-  currentSceneId: initialSceneId,
-  chairFixed: false,
-  hasDuctTape: false,
-  inventory: [],
-  flags: { ...defaultFlagsState },
-  message: null,
-  look: "neutral",
-  score: 0,
-});
+const isValidStateId = (stateId: unknown, spec: GameSpec): stateId is StateId =>
+  typeof stateId === "string" &&
+  (stateId in spec.states || Boolean(spec.terminals?.[stateId]));
 
-const isValidLook = (value: unknown): value is GameStateLook =>
-  value === "neutral" || value === "happy" || value === "angry";
-
-const STORAGE_KEY = "eve-hunter-adventure/game-state";
-
-const loadFlags = (value: unknown, defaults: FlagsState): FlagsState => {
-  if (!value || typeof value !== "object") {
-    return defaults;
-  }
-  const record = value as Record<string, unknown>;
-  return {
-    bootsStuffed:
-      typeof record.bootsStuffed === "boolean"
-        ? record.bootsStuffed
-        : defaults.bootsStuffed,
-    disguiseChecked:
-      typeof record.disguiseChecked === "boolean"
-        ? record.disguiseChecked
-        : defaults.disguiseChecked,
-  };
-};
-
-const loadStoredGameState = (): GameState => {
+const loadStoredGameState = (spec: GameSpec): GameState => {
   if (typeof window === "undefined") {
-    return createInitialGameState();
+    return createInitialGameState(spec);
   }
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      return createInitialGameState();
+      return createInitialGameState(spec);
     }
     const parsed = JSON.parse(raw) as Partial<GameState>;
-    const defaults = createInitialGameState();
+    const defaults = createInitialGameState(spec);
     return {
       ...defaults,
       ...parsed,
-      inventory: Array.isArray(parsed?.inventory)
-        ? parsed?.inventory
-        : defaults.inventory,
-      flags: loadFlags(parsed?.flags, defaults.flags),
+      currentStateId: isValidStateId(parsed?.currentStateId, spec)
+        ? parsed.currentStateId
+        : defaults.currentStateId,
+      flags: {
+        persistent: {
+          ...defaults.flags.persistent,
+          ...(parsed?.flags?.persistent ?? {}),
+        },
+        daily: {
+          ...defaults.flags.daily,
+          ...(parsed?.flags?.daily ?? {}),
+        },
+      },
+      variables: {
+        ...defaults.variables,
+        ...(parsed?.variables ?? {}),
+      },
       message:
         typeof parsed?.message === "string" || parsed?.message === null
           ? parsed?.message ?? null
           : defaults.message,
-      look: isValidLook(parsed?.look) ? parsed.look : defaults.look,
-      score: typeof parsed?.score === "number" ? parsed.score : defaults.score,
+      isEnded:
+        typeof parsed?.isEnded === "boolean"
+          ? parsed?.isEnded
+          : defaults.isEnded,
     };
   } catch (error) {
     console.warn("Failed to parse saved game state", error);
-    return createInitialGameState();
+    return createInitialGameState(spec);
   }
 };
 
+const getLoopVar = (state: GameState, key: VarPath) =>
+  state.variables[key] as number | string | boolean | undefined;
+
 export const useGameState = () => {
-  const [gameState, setGameState] = useState<GameState>(loadStoredGameState);
+  const [gameState, setGameState] = useState<GameState>(() =>
+    loadStoredGameState(gameSpec)
+  );
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -96,19 +80,12 @@ export const useGameState = () => {
     }
   }, [gameState]);
 
-  const executeEffect = (objectInteraction: ObjectInteraction) => {
-    setGameState((oldState: GameState) => {
-      const wrapper = new GameStateWrapper(oldState);
-      objectInteraction.effect(wrapper);
-      const nextState = wrapper.getState();
-      return {
-        ...nextState,
-      };
-    });
+  const applyGameAction = (actionId: string, choiceId?: string) => {
+    setGameState((oldState) => applyAction(oldState, gameSpec, actionId, choiceId));
   };
 
   const resetGame = () => {
-    setGameState(createInitialGameState());
+    setGameState(createInitialGameState(gameSpec));
   };
 
   const resetMessage = () => {
@@ -119,8 +96,9 @@ export const useGameState = () => {
   };
 
   return {
-    executeEffect,
+    applyGameAction,
     gameState,
+    getLoopVar,
     resetGame,
     resetMessage,
   };

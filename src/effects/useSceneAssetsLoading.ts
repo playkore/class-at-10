@@ -28,7 +28,9 @@ export const useSceneAssetsLoading = (scene: SceneDefinition) => {
   });
 
   const sources = useMemo(() => {
-    const baseSources = [resolveSceneImage(scene.imageSrc)];
+    const baseSources = scene.imageSrc
+      ? [resolveSceneImage(scene.imageSrc)]
+      : [];
     const objectSources = scene.objects
       .filter((object) => Boolean(object.imageSrc))
       .map((object) => resolveSceneImage(object.imageSrc as string));

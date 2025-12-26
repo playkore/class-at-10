@@ -30,6 +30,31 @@
   filter: contrast(1.08) saturate(0.95) brightness(0.92);
 }
 
+.sceneBackdrop {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+      circle at 20% 20%,
+      rgba(0, 255, 122, 0.12),
+      transparent 45%
+    ),
+    radial-gradient(
+      circle at 80% 30%,
+      rgba(120, 220, 255, 0.08),
+      transparent 45%
+    ),
+    linear-gradient(160deg, rgba(6, 18, 12, 0.95), rgba(4, 10, 8, 0.88));
+}
+
+.pov--text-mode .hitbox {
+  border-color: rgba(0, 255, 122, 0.25);
+  background: rgba(0, 255, 122, 0.06);
+}
+
+.pov--text-mode .tag {
+  opacity: 1;
+}
+
 .objectImage {
   position: absolute;
   inset: 0;
@@ -60,6 +85,7 @@
   color: rgba(215, 255, 231, 0.9);
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
   min-height: 1.2em;
+  white-space: pre-line;
 }
 
 .sceneActionsOverlay {

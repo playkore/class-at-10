@@ -1,11 +1,12 @@
-import { GameState } from "../effects/useGameState";
-import type { SceneId } from "../data/scenes";
-import { GameStateWrapper } from "../effects/gameStateWrapper";
+import type { GameState } from "../effects/useGameState";
 
-type SceneEffectCommandFunction = (stateWrapper: GameStateWrapper) => void;
 export interface ObjectInteraction {
   label: string;
-  effect: SceneEffectCommandFunction;
+  kind: "action" | "menu" | "ui";
+  actionId?: string;
+  choiceId?: string;
+  uiAction?: "back";
+  autoRun?: boolean;
 }
 
 export interface BoundingBox {
@@ -24,7 +25,7 @@ export interface BoundingBox {
 export interface SceneObject {
   id: string;
   name: string;
-  description: string;
+  description?: string;
   boundingBox: BoundingBox;
   interactions: ObjectInteraction[];
   imageSrc?: string;
@@ -32,9 +33,9 @@ export interface SceneObject {
 }
 
 export interface SceneDefinition {
-  id: SceneId;
+  id: string;
   name: string;
-  imageSrc: string;
+  imageSrc?: string;
   description?: string;
   objects: SceneObject[];
   interactions: ObjectInteraction[];
