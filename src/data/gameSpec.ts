@@ -622,7 +622,7 @@ export const gameSpec: GameSpec = {
               ],
             },
           ],
-          image: "objects/tram_doors.png",
+          image: "public/scenes/tram-stop.png",
           visible: true,
         },
       ],
@@ -681,13 +681,13 @@ export const gameSpec: GameSpec = {
               ],
             },
           ],
-          image: "objects/conductor.png",
+          image: "scenes/tram-inside.png",
         },
       ],
     },
     university_outside: {
       title: "Университет, на улице",
-      image: "scenes/university_exterior.png",
+      image: "scenes/university-entrance.png",
       actions: [
         {
           text: "Войти внутрь",
@@ -703,7 +703,6 @@ export const gameSpec: GameSpec = {
   terminals: {
     true_ending: {
       title: "Конец",
-      image: "scenes/darkness.png",
       effects: [
         {
           end: true,
