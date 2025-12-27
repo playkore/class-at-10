@@ -1,22 +1,22 @@
 import { StateNode } from "../types";
 
 const scene: StateNode = {
-  title: "Комната, вид на окно",
+  title: "Кухня, у окна",
   image: "scenes/apartment-curtains/background.png",
   actions: [
     {
       text: "Раздвинуть шторы",
       effects: [
         {
-          goto: "room_curtains_open",
+          goto: "kitchen_curtains_open",
         },
       ],
     },
     {
-      text: "Назад к столу",
+      text: "Назад",
       effects: [
         {
-          goto: "room_desk_view",
+          goto: "kitchen",
         },
       ],
     },

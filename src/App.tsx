@@ -258,32 +258,33 @@ const App = () => {
   };
 
   const handleCopySpec = async () => {
-    const updatedStates = Object.fromEntries(
-      Object.entries(gameSpec.states).map(([stateId, stateNode]) => {
-        if (!stateNode.objects || stateNode.objects.length === 0) {
-          return [stateId, stateNode];
+    const stateId = sceneId;
+    const stateNode = gameSpec.states[stateId];
+    if (!stateNode) {
+      return;
+    }
+
+    const updatedState = stateNode.objects?.length
+      ? {
+          ...stateNode,
+          objects: stateNode.objects.map((sceneObject, index) => {
+            const objectId = sceneObject.id ?? `${stateId}-object-${index}`;
+            const override = boundingBoxOverrides[objectId];
+            if (!override) {
+              return sceneObject;
+            }
+            return {
+              ...sceneObject,
+              boundingBox: { ...override },
+            };
+          }),
         }
-        const objects = stateNode.objects.map((sceneObject, index) => {
-          const objectId = sceneObject.id ?? `${stateId}-object-${index}`;
-          const override = boundingBoxOverrides[objectId];
-          if (!override) {
-            return sceneObject;
-          }
-          return {
-            ...sceneObject,
-            boundingBox: { ...override },
-          };
-        });
-        return [stateId, { ...stateNode, objects }];
-      })
-    );
-    const updatedSpec = {
-      ...gameSpec,
-      states: updatedStates,
-    };
+      : stateNode;
 
     try {
-      await navigator.clipboard.writeText(JSON.stringify(updatedSpec, null, 2));
+      await navigator.clipboard.writeText(
+        JSON.stringify(updatedState, null, 2)
+      );
     } catch (error) {
       console.warn("Failed to copy updated spec", error);
     }

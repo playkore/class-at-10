@@ -7,8 +7,8 @@ import bathroom from "./scenes/bathroom";
 import kitchen from "./scenes/kitchen";
 import kitchen_bowl from "./scenes/kitchen_bowl";
 import room_desk_view from "./scenes/room_desk_view";
-import room_curtains_closed from "./scenes/room_curtains_closed";
-import room_curtains_open from "./scenes/room_curtains_open";
+import kitchen_curtains_closed from "./scenes/kitchen_curtains_closed";
+import kitchen_curtains_open from "./scenes/kitchen_curtains_open";
 import room_desk_drawer_open from "./scenes/room_desk_drawer_open";
 import tram_stop from "./scenes/tram_stop";
 import tram_inside from "./scenes/tram_inside";
@@ -145,8 +145,8 @@ export const gameSpec: GameSpec = {
     kitchen,
     kitchen_bowl,
     room_desk_view,
-    room_curtains_closed,
-    room_curtains_open,
+    kitchen_curtains_closed,
+    kitchen_curtains_open,
     room_desk_drawer_open,
     tram_stop,
     tram_inside,

@@ -55,8 +55,7 @@ const scene: StateNode = {
               },
               effects: [
                 {
-                  message:
-                    "Мне там ничего не нужно, там только хлам всякий.",
+                  message: "Мне там ничего не нужно, там только хлам всякий.",
                 },
               ],
             },
@@ -154,14 +153,6 @@ const scene: StateNode = {
     },
   ],
   actions: [
-    {
-      text: "Посмотреть в окно",
-      effects: [
-        {
-          goto: "room_curtains_closed",
-        },
-      ],
-    },
     {
       text: "В коридор",
       effects: [

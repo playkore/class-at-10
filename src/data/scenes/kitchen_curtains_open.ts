@@ -1,7 +1,7 @@
 import { StateNode } from "../types";
 
 const scene: StateNode = {
-  title: "Комната, окно открыто",
+  title: "Кухня, у окна, шторы раздвинуты",
   image: "scenes/apartment-curtains-open/background.png",
   objects: [
     {
@@ -44,15 +44,15 @@ const scene: StateNode = {
       text: "Задвинуть шторы",
       effects: [
         {
-          goto: "room_curtains_closed",
+          goto: "kitchen_curtains_closed",
         },
       ],
     },
     {
-      text: "Назад к столу",
+      text: "Назад",
       effects: [
         {
-          goto: "room_desk_view",
+          goto: "kitchen",
         },
       ],
     },

@@ -60,6 +60,94 @@ const scene: StateNode = {
       image: "",
       visible: true,
     },
+    {
+      id: "kitchen_room_door",
+      name: "Дверь в кухню",
+      description: "Ведёт в кухню",
+      boundingBox: {
+        x: 0.8,
+        y: 0.11,
+        width: 0.15,
+        height: 0.44,
+      },
+      actions: [
+        {
+          text: "Зайти",
+          effects: [
+            {
+              goto: "kitchen",
+            },
+          ],
+        },
+      ],
+      image: "",
+      visible: true,
+    },
+    {
+      id: "outside_door",
+      name: "Дверь на улицу",
+      description: "Ведёт на улицу",
+      boundingBox: {
+        x: 0.04,
+        y: 0.08,
+        width: 0.16,
+        height: 0.63,
+      },
+      actions: [
+        {
+          text: "Выйти",
+          guards: [
+            {
+              if: {
+                not: "daily.has_keys",
+              },
+              effects: [
+                {
+                  message: "А домой я как попаду? Ключи не взяла!",
+                },
+              ],
+            },
+            {
+              if: {
+                not: "daily.has_notebook",
+              },
+              effects: [
+                {
+                  message: "А писать я в чем в институте буду?",
+                },
+              ],
+            },
+            {
+              if: {
+                not: "daily.is_dressed",
+              },
+              effects: [
+                {
+                  message: "Как я на улицу пойду в таком виде?",
+                },
+              ],
+            },
+            {
+              if: {
+                or: ["daily.has_pass", "daily.has_coins"],
+              },
+              effects: [
+                {
+                  message: "Как я на трамвае поеду, зайцем?",
+                },
+              ],
+            },
+          ],
+          effects: [
+            {
+              goto: "tram_stop",
+            },
+          ],
+        },
+      ],
+      image: "",
+      visible: true,
+    },
   ],
   actions: [
     {
@@ -67,64 +155,6 @@ const scene: StateNode = {
       effects: [
         {
           goto: "room_desk_view",
-        },
-      ],
-    },
-    {
-      text: "Пойти на кухню",
-      effects: [
-        {
-          goto: "kitchen",
-        },
-      ],
-    },
-    {
-      text: "Выйти на улицу",
-      guards: [
-        {
-          if: {
-            not: "daily.has_keys",
-          },
-          effects: [
-            {
-              message: "А домой я как попаду? Ключи не взяла!",
-            },
-          ],
-        },
-        {
-          if: {
-            not: "daily.has_notebook",
-          },
-          effects: [
-            {
-              message: "А писать я в чем в институте буду?",
-            },
-          ],
-        },
-        {
-          if: {
-            not: "daily.is_dressed",
-          },
-          effects: [
-            {
-              message: "Как я на улицу пойду в таком виде?",
-            },
-          ],
-        },
-        {
-          if: {
-            or: ["daily.has_pass", "daily.has_coins"],
-          },
-          effects: [
-            {
-              message: "Как я на трамвае поеду, зайцем?",
-            },
-          ],
-        },
-      ],
-      effects: [
-        {
-          goto: "tram_stop",
         },
       ],
     },

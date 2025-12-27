@@ -69,7 +69,7 @@ export interface SceneObject {
   description?: string;
   boundingBox: BoundingBox;
   actions: ActionDef[];
-  image: string;
+  image?: string;
   visible?: BooleanExpression;
 }
 export interface StateNode {
