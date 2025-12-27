@@ -27,21 +27,15 @@ export const useSceneAssetsLoading = (scene: StateNode) => {
     totalCount: 0,
   });
 
-  const sourceKey = [
-    scene.image ?? "",
-    ...(scene.objects ?? []).map((object) => object.image ?? ""),
-  ].join("|");
-
   const sources = useMemo(() => {
-    const baseSources = scene.image
-      ? [resolveSceneImage(scene.image)]
-      : [];
+    const baseSources = scene.image ? [resolveSceneImage(scene.image)] : [];
     const objectSources = (scene.objects ?? [])
-      .filter((object) => Boolean(object.image))
-      .map((object) => resolveSceneImage(object.image));
+      .map((object) => object.image)
+      .filter((image): image is string => Boolean(image))
+      .map((image) => resolveSceneImage(image));
 
     return [...baseSources, ...objectSources];
-  }, [sourceKey]);
+  }, [scene.image, scene.objects]);
 
   useEffect(() => {
     let isActive = true;

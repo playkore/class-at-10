@@ -43,10 +43,8 @@ export const useGameState = (spec: GameSpec) => {
     }
   }, [gameState]);
 
-  const applyGameAction = (actionId: string, choiceId?: string) => {
-    setGameState((oldState) =>
-      applyAction(oldState, spec, actionId, choiceId)
-    );
+  const applyGameAction = (actionId: number) => {
+    setGameState((oldState) => applyAction(oldState, spec, actionId));
   };
 
   const resetGame = () => {

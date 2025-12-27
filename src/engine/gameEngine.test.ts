@@ -5,11 +5,10 @@ import {
   applyAction,
   buildActionLabel,
   createInitialGameState,
-  evaluateGuards,
   getNode,
 } from "./gameEngine";
 
-const baseSpec = (actions: Record<string, ActionDef>): GameSpec => ({
+const baseSpec = (actions: ActionDef[]): GameSpec => ({
   meta: {
     game_id: "test",
     title: "Test",
@@ -30,24 +29,24 @@ const baseSpec = (actions: Record<string, ActionDef>): GameSpec => ({
     },
     daily_flags: {
       d1: { initial: false },
-      bus: { initial: false },
-      train: { initial: false },
     },
   },
   states: {
     start: {
       title: "Start",
+      image: "",
       on_enter: {
-        message_if: [
-          { if: { "loop.points": 1 }, then: "Points 1" },
-          { else: "No points" },
+        messages: [
+          { message: "Daily on", visible: "daily.d1" },
+          { message: "Daily off", visible: true },
         ],
       },
       actions,
     },
     middle: {
       title: "Middle",
-      actions: {},
+      image: "",
+      actions: [],
     },
   },
   terminals: {
@@ -60,21 +59,21 @@ const baseSpec = (actions: Record<string, ActionDef>): GameSpec => ({
 
 describe("createInitialGameState", () => {
   it("hydrates flags, variables, and on-enter message", () => {
-    const spec = baseSpec({});
+    const spec = baseSpec([]);
     const state = createInitialGameState(spec);
 
     expect(state.currentStateId).toBe("start");
     expect(state.flags.persistent.p1).toBe(true);
     expect(state.flags.daily.d1).toBe(false);
     expect(state.variables["loop.points"]).toBe(1);
-    expect(state.message).toBe("Points 1");
+    expect(state.message).toBe("Daily off");
     expect(state.isEnded).toBe(false);
   });
 });
 
 describe("getNode", () => {
   it("returns state, terminal, or missing lookups", () => {
-    const spec = baseSpec({});
+    const spec = baseSpec([]);
 
     expect(getNode(spec, "start").kind).toBe("state");
     expect(getNode(spec, "end").kind).toBe("terminal");
@@ -82,101 +81,66 @@ describe("getNode", () => {
   });
 });
 
-describe("evaluateGuards", () => {
-  it("handles nested and any guards with proper failure metadata", () => {
-    const spec = baseSpec({});
-    const state = createInitialGameState(spec);
-
-    const result = evaluateGuards(
-      [
-        { gte: ["loop.points", 1] },
-        { not: { flag: "bus" } },
-        { any: [{ flag: "bus" }, { flag: "train" }] },
-      ],
-      state
-    );
-
-    expect(result.passed).toBe(false);
-    expect(result.failedGuard).toEqual({
-      any: [{ flag: "bus" }, { flag: "train" }],
-    });
-  });
-});
-
 describe("applyAction", () => {
-  it("uses on-fail message_by_first_failed_guard with any guards", () => {
-    const spec = baseSpec({
-      travel: {
-        guard: [{ any: [{ flag: "bus" }, { flag: "train" }] }],
-        on_fail: {
-          stay: true,
-          message_by_first_failed_guard: {
-            transport: "Need transport",
-          },
-        },
-        goto: "middle",
+  it("applies failed effects when guard blocks action", () => {
+    const spec = baseSpec([
+      {
+        text: "Travel",
+        guard: "daily.d1",
+        failed_effects: [{ message: "Need a pass" }],
+        effects: [{ goto: "middle" }],
       },
-    });
+    ]);
 
     const state = createInitialGameState(spec);
-    const nextState = applyAction(state, spec, "travel");
+    const nextState = applyAction(state, spec, 0);
 
     expect(nextState.currentStateId).toBe("start");
-    expect(nextState.message).toBe("Need transport");
+    expect(nextState.message).toBe("Need a pass");
   });
 
-  it("applies choice effects, messages, and terminal transitions", () => {
-    const spec = baseSpec({
-      pick: {
-        effects: [{ set: { "daily.d1": true } }],
-        choices: [
+  it("uses the first matching guard before action effects", () => {
+    const spec = baseSpec([
+      {
+        text: "Check",
+        guards: [
           {
-            id: "take",
-            text: "Take",
-            message: "Chose take",
-            effects: [{ inc: { "loop.points": 2 } }],
-            goto: "end",
+            if: "persistent.p1",
+            effects: [{ message: "Handled by guard" }],
           },
         ],
+        effects: [{ set: { "daily.d1": true } }],
       },
-    });
+    ]);
 
     const state = createInitialGameState(spec);
-    const nextState = applyAction(state, spec, "pick", "take");
+    const nextState = applyAction(state, spec, 0);
 
-    expect(nextState.currentStateId).toBe("end");
-    expect(nextState.variables["loop.points"]).toBe(3);
-    expect(nextState.flags.daily.d1).toBe(true);
-    expect(nextState.flags.persistent.p1).toBe(false);
-    expect(nextState.message).toBe("Chose take");
-    expect(nextState.isEnded).toBe(true);
+    expect(nextState.message).toBe("Handled by guard");
+    expect(nextState.flags.daily.d1).toBe(false);
   });
 
-  it("applies conditional branches and messages", () => {
-    const spec = baseSpec({
-      check: {
-        if: {
-          guard: ["daily.d1"],
-          then: { message: "Allowed" },
-          else: {
-            message: "Blocked",
-            effects: [{ set: { "loop.points": 5 } }],
-          },
-        },
+  it("applies goto effects and terminal effects", () => {
+    const spec = baseSpec([
+      {
+        text: "Finish",
+        effects: [{ set: { "daily.d1": true } }, { goto: "end" }],
       },
-    });
+    ]);
 
     const state = createInitialGameState(spec);
-    const nextState = applyAction(state, spec, "check");
+    const nextState = applyAction(state, spec, 0);
 
-    expect(nextState.message).toBe("Blocked");
-    expect(nextState.variables["loop.points"]).toBe(5);
+    expect(nextState.currentStateId).toBe("end");
+    expect(nextState.flags.daily.d1).toBe(true);
+    expect(nextState.flags.persistent.p1).toBe(false);
+    expect(nextState.isEnded).toBe(true);
   });
 });
 
 describe("buildActionLabel", () => {
   it("falls back to id when text is blank", () => {
-    expect(buildActionLabel("rest", { text: "  " })).toBe("rest");
-    expect(buildActionLabel("rest", { text: "Rest" })).toBe("Rest");
+    expect(buildActionLabel(2, { text: "  ", effects: [] })).toBe("2");
+    expect(buildActionLabel(2, { text: "Rest", effects: [] })).toBe("Rest");
   });
 });

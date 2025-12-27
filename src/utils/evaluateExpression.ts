@@ -15,7 +15,7 @@ const getValue = (state: GameState, path: ValuePath) => {
 export const evaluateExpression = (
   expression: BooleanExpression | undefined,
   state: GameState
-) => {
+): boolean => {
   if (expression === undefined) {
     return true;
   }

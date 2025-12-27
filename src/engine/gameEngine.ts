@@ -1,17 +1,15 @@
 import type {
   ActionDef,
   ActionId,
-  ChoiceDef,
-  ChoiceId,
   Effect,
   GameSpec,
-  Guard,
   StateId,
   StateNode,
   TerminalNode,
   ValuePath,
   VarPath,
 } from "../data/types";
+import { evaluateExpression } from "../utils/evaluateExpression";
 
 export type FlagState = Record<string, boolean>;
 export type VariableState = Record<VarPath, number | string | boolean>;
@@ -25,11 +23,6 @@ export type GameState = {
   variables: VariableState;
   message: string | null;
   isEnded: boolean;
-};
-
-export type GuardCheck = {
-  passed: boolean;
-  failedGuard?: Guard;
 };
 
 export type NodeLookup =
@@ -98,17 +91,6 @@ const cloneState = (state: GameState): GameState => ({
   isEnded: state.isEnded,
 });
 
-const getFlagValue = (state: GameState, path: ValuePath) => {
-  const [namespace, key] = path.split(".");
-  if (namespace === "daily") {
-    return Boolean(state.flags.daily[key]);
-  }
-  if (namespace === "persistent") {
-    return Boolean(state.flags.persistent[key]);
-  }
-  return state.variables[path as VarPath];
-};
-
 const setFlagValue = (state: GameState, path: ValuePath, value: any) => {
   const [namespace, key] = path.split(".");
   if (namespace === "daily") {
@@ -122,82 +104,44 @@ const setFlagValue = (state: GameState, path: ValuePath, value: any) => {
   state.variables[path as VarPath] = value;
 };
 
-const evaluateGuard = (guard: Guard, state: GameState): GuardCheck => {
-  if (typeof guard === "string") {
-    return { passed: Boolean(getFlagValue(state, guard)) };
-  }
-  if ("flag" in guard) {
-    return { passed: Boolean(state.flags.daily[guard.flag]) };
-  }
-  if ("not_flag" in guard) {
-    return { passed: !state.flags.daily[guard.not_flag] };
-  }
-  if ("not" in guard) {
-    const result = evaluateGuard(guard.not, state);
-    return { passed: !result.passed };
-  }
-  if ("gte" in guard) {
-    const [left, right] = guard.gte;
-    const leftValue =
-      typeof left === "number" ? left : getFlagValue(state, left);
-    return {
-      passed: typeof leftValue === "number" && leftValue >= right,
-    };
-  }
-  if ("any" in guard) {
-    for (const entry of guard.any) {
-      if (evaluateGuard(entry, state).passed) {
-        return { passed: true };
-      }
-    }
-    return { passed: false, failedGuard: guard };
-  }
-  return { passed: false };
-};
-
-export const evaluateGuards = (
-  guards: Guard[] | undefined,
+const getOnEnterMessage = (
+  spec: GameSpec,
+  stateId: StateId,
   state: GameState
-): GuardCheck => {
-  if (!guards || guards.length === 0) {
-    return { passed: true };
+) => {
+  const lookup = getNode(spec, stateId);
+  if (lookup.kind !== "state") {
+    return null;
   }
-  for (const guard of guards) {
-    const result = evaluateGuard(guard, state);
-    if (!result.passed) {
-      return { passed: false, failedGuard: result.failedGuard ?? guard };
-    }
+  const onEnter = lookup.node.on_enter;
+  if (!onEnter?.messages?.length) {
+    return null;
   }
-  return { passed: true };
+  const match = onEnter.messages.find((item) =>
+    evaluateExpression(item.visible, state)
+  );
+  return match?.message ?? null;
 };
 
-const getGuardKey = (
-  guard: Guard,
-  messageMap?: Record<string, string>
-) => {
-  if (typeof guard === "string") {
-    return guard;
+const applyGoto = (state: GameState, spec: GameSpec, target?: StateId) => {
+  if (!target) {
+    return;
   }
-  if ("flag" in guard) {
-    return `daily.${guard.flag}`;
+  state.currentStateId = target;
+  const lookup = getNode(spec, target);
+  if (lookup.kind === "terminal") {
+    applyEffects(state, spec, lookup.node.effects);
+    return;
   }
-  if ("not_flag" in guard) {
-    return `daily.${guard.not_flag}`;
-  }
-  if ("not" in guard) {
-    return getGuardKey(guard.not, messageMap);
-  }
-  if ("gte" in guard) {
-    const [left] = guard.gte;
-    return typeof left === "string" ? left : "gte";
-  }
-  if ("any" in guard) {
-    if (messageMap?.transport) {
-      return "transport";
+  if (lookup.kind === "state" && !state.message) {
+    const onEnterMessage = getOnEnterMessage(spec, target, state);
+    if (onEnterMessage) {
+      state.message = onEnterMessage;
     }
-    return "any";
   }
-  return "guard";
+  if (spec.meta.loop.end_states.includes(target)) {
+    state.isEnded = true;
+  }
 };
 
 const applyEffects = (state: GameState, spec: GameSpec, effects?: Effect[]) => {
@@ -231,105 +175,31 @@ const applyEffects = (state: GameState, spec: GameSpec, effects?: Effect[]) => {
       }
       continue;
     }
+    if ("message" in effect) {
+      state.message = effect.message;
+      continue;
+    }
+    if ("goto" in effect) {
+      applyGoto(state, spec, effect.goto);
+      continue;
+    }
     if ("end" in effect) {
       state.isEnded = true;
     }
   }
 };
 
-const applyConditional = (
-  state: GameState,
-  spec: GameSpec,
-  conditional: ActionDef["if"]
-) => {
-  if (!conditional) {
-    return;
-  }
-  const guardResult = evaluateGuards(conditional.guard, state);
-  const branch = guardResult.passed ? conditional.then : conditional.else;
-  if (!branch) {
-    return;
-  }
-  applyEffects(state, spec, branch.effects);
-  if (branch.message) {
-    state.message = branch.message;
-  }
-};
-
-const getChoice = (
-  action: ActionDef,
-  choiceId?: ChoiceId
-): ChoiceDef | null => {
-  if (!action.choices || action.choices.length === 0) {
-    return null;
-  }
-  if (!choiceId) {
-    return null;
-  }
-  return action.choices.find((choice) => choice.id === choiceId) ?? null;
-};
-
-const getOnEnterMessage = (
-  spec: GameSpec,
-  stateId: StateId,
-  state: GameState
-) => {
-  const lookup = getNode(spec, stateId);
-  if (lookup.kind !== "state") {
-    return null;
-  }
-  const onEnter = lookup.node.on_enter;
-  if (!onEnter) {
-    return null;
-  }
-  if (onEnter.message_if) {
-    let elseMessage: string | null = null;
-    for (const item of onEnter.message_if) {
-      if ("else" in item) {
-        elseMessage = item.else;
-        continue;
-      }
-      const checks = Object.entries(item.if);
-      const matches = checks.every(([path, value]) => {
-        return getFlagValue(state, path as ValuePath) === value;
-      });
-      if (matches) {
-        return item.then;
-      }
-    }
-    if (elseMessage) {
-      return elseMessage;
-    }
-  }
-  return onEnter.message ?? null;
-};
-
-const applyGoto = (state: GameState, spec: GameSpec, target?: StateId) => {
-  if (!target) {
-    return;
-  }
-  state.currentStateId = target;
-  const lookup = getNode(spec, target);
-  if (lookup.kind === "terminal") {
-    applyEffects(state, spec, lookup.node.effects);
-    return;
-  }
-  if (lookup.kind === "state" && !state.message) {
-    const onEnterMessage = getOnEnterMessage(spec, target, state);
-    if (onEnterMessage) {
-      state.message = onEnterMessage;
-    }
-  }
-  if (spec.meta.loop.end_states.includes(target)) {
+const finalizeState = (state: GameState, spec: GameSpec) => {
+  if (spec.meta.loop.end_states.includes(state.currentStateId)) {
     state.isEnded = true;
   }
+  return state;
 };
 
 export const applyAction = (
   state: GameState,
   spec: GameSpec,
-  actionId: ActionId,
-  choiceId?: ChoiceId
+  actionId: ActionId
 ): GameState => {
   if (state.isEnded) {
     return state;
@@ -338,7 +208,8 @@ export const applyAction = (
   if (lookup.kind !== "state") {
     return state;
   }
-  const action = lookup.node.actions[actionId];
+  const actions = lookup.node.actions ?? [];
+  const action = actions[actionId];
   if (!action) {
     return state;
   }
@@ -346,52 +217,23 @@ export const applyAction = (
   const nextState = cloneState(state);
   nextState.message = null;
 
-  const guardResult = evaluateGuards(action.guard, nextState);
-  if (!guardResult.passed) {
-    const onFail = action.on_fail;
-    if (onFail) {
-      if (onFail.message) {
-        nextState.message = onFail.message;
-      } else if (onFail.message_by_first_failed_guard) {
-        const failedGuard = guardResult.failedGuard ?? action.guard?.[0];
-        if (failedGuard) {
-          const key = getGuardKey(
-            failedGuard,
-            onFail.message_by_first_failed_guard
-          );
-          nextState.message =
-            onFail.message_by_first_failed_guard[key] ?? nextState.message;
-        }
-      }
-      if (onFail.stay) {
-        return nextState;
+  if (action.guard && !evaluateExpression(action.guard, nextState)) {
+    applyEffects(nextState, spec, action.failed_effects);
+    return finalizeState(nextState, spec);
+  }
+
+  if (action.guards) {
+    for (const guard of action.guards) {
+      if (evaluateExpression(guard.if, nextState)) {
+        applyEffects(nextState, spec, guard.effects);
+        return finalizeState(nextState, spec);
       }
     }
-    return nextState;
   }
 
   applyEffects(nextState, spec, action.effects);
-
-  const chosen = getChoice(action, choiceId);
-  if (chosen) {
-    applyEffects(nextState, spec, chosen.effects);
-    if (chosen.message) {
-      nextState.message = chosen.message;
-    }
-    applyGoto(nextState, spec, chosen.goto ?? action.goto);
-    return nextState;
-  }
-
-  applyConditional(nextState, spec, action.if);
-
-  if (!nextState.message && action.message) {
-    nextState.message = action.message;
-  }
-
-  applyGoto(nextState, spec, action.goto);
-
-  return nextState;
+  return finalizeState(nextState, spec);
 };
 
 export const buildActionLabel = (actionId: ActionId, action: ActionDef) =>
-  action.text?.trim() ? action.text : actionId;
+  action.text?.trim() ? action.text : String(actionId);

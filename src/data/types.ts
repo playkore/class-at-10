@@ -1,5 +1,6 @@
 // Core JSON schema types for the loop-game DSL.
 export type StateId = string;
+export type ActionId = number;
 export type ChoiceId = string;
 
 export type FlagNamespace = "persistent" | "daily";
@@ -55,7 +56,7 @@ export interface BoundingBox {
   height: number;
 }
 
-type BooleanExpression =
+export type BooleanExpression =
   | { and: BooleanExpression[] }
   | { or: BooleanExpression[] }
   | { not: BooleanExpression }
@@ -94,10 +95,10 @@ export interface OnEnter {
   messages: ConditionalMessage[];
 }
 
-type Guard = {
+export type ConditionalGuard = {
   if: BooleanExpression;
   effects: Effect[];
-}
+};
 
 export interface ActionDef {
   // The action button text.
@@ -112,7 +113,7 @@ export interface ActionDef {
   failed_effects?: Effect[];
   // If none of the guards fail, the effects are applied.
   // Otherwise, the effects from the first failed guard are applied.
-  guards?: Guard[];
+  guards?: ConditionalGuard[];
 }
 
 export interface ChoiceDef {
