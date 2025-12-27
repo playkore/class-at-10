@@ -114,6 +114,10 @@ export const gameSpec: GameSpec = {
         description: "Сходила в туалет в универе (один раз за день)",
         initial: false,
       },
+      paid_for_tram: {
+        description: "Оплатила проезд в трамвае (один раз за день)",
+        initial: false,
+      },
       found_natasha_notebook: {
         description: "Нашла тетрадь Наташи в туалете универа",
         initial: false,

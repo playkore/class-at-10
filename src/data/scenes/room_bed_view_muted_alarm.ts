@@ -8,7 +8,7 @@ const scene: StateNode = {
       text: "Встать",
       effects: [
         {
-          goto: "corridor",
+          goto: "room_desk_view",
         },
       ],
     },

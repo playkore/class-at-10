@@ -3,6 +3,17 @@ import { StateNode } from "../types";
 const scene: StateNode = {
   title: "В трамвае, виден кондуктор",
   image: "scenes/tram-inside/background.png",
+  actions: [
+    {
+      text: "Выйти на остановке",
+      effects: [
+        {
+          goto: "university_outside",
+        },
+      ],
+      visible: "daily.paid_for_tram",
+    },
+  ],
   objects: [
     {
       name: "Кондуктор",
@@ -25,6 +36,11 @@ const scene: StateNode = {
                 {
                   set: {
                     "persistent.pass_unlocked": true,
+                  },
+                },
+                {
+                  set: {
+                    "daily.paid_for_tram": true,
                   },
                 },
                 {
