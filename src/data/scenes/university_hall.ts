@@ -11,48 +11,7 @@ const scene: StateNode = {
       },
     ],
   },
-  actions: [
-    {
-      text: "Туалет",
-      guards: [
-        {
-          if: "daily.used_toilet_uni",
-          effects: [
-            {
-              message: "Я уже забегала сюда сегодня.",
-            },
-          ],
-        },
-        {
-          if: "daily.used_toilet_home",
-          effects: [
-            {
-              message: "Ладно, надо было сходить дома. Теперь поздно.",
-            },
-          ],
-        },
-      ],
-      effects: [
-        {
-          goto: "uni_toilet",
-        },
-      ],
-    },
-    {
-      text: "Аудитория 404",
-      guard: "persistent.knows_schedule",
-      failed_effects: [
-        {
-          message: "Хм… Я ведь так и не посмотрела расписание.",
-        },
-      ],
-      effects: [
-        {
-          goto: "lecture_hall",
-        },
-      ],
-    },
-  ],
+  actions: [],
   objects: [
     {
       name: "Парень",
@@ -96,6 +55,69 @@ const scene: StateNode = {
           effects: [
             {
               goto: "university_hall_corner",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: "Дверь в туалет",
+      description: "Дверь в женский туалет",
+      boundingBox: {
+        x: 0.05,
+        y: 0.51,
+        width: 0.13,
+        height: 0.18,
+      },
+      actions: [
+        {
+          text: "Войти",
+          guards: [
+            {
+              if: "daily.used_toilet_home",
+              effects: [
+                {
+                  message: "Не хочется.",
+                },
+              ],
+            },
+          ],
+          effects: [
+            {
+              goto: "uni_toilet",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: "К аудиториям",
+      description: "Проход к аудиториям университета",
+      boundingBox: {
+        x: 0.34,
+        y: 0.42,
+        width: 0.32,
+        height: 0.28,
+      },
+      actions: [
+        {
+          text: "Идти на занятия",
+          effects: [
+            {
+              goto: "lecture_hall",
+            },
+          ],
+          guards: [
+            {
+              if: {
+                not: "persistent.knows_schedule",
+              },
+              effects: [
+                {
+                  message:
+                    "Я не знаю, в какой аудитории сегодня занятие. Подожду тут одногруппниц.",
+                },
+              ],
             },
           ],
         },
