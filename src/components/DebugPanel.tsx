@@ -1,6 +1,7 @@
 import type { Dispatch, SetStateAction } from "react";
 import type { GameSpec, VariableSpec, VarPath } from "../data/types";
 import type { GameState } from "../engine/gameEngine";
+import { evaluateExpression } from "../utils/evaluateExpression";
 import "./DebugPanel.css";
 
 type DebugPanelProps = {
@@ -25,6 +26,21 @@ const getVariableInputType = (
     return "string";
   }
   return specType ?? "float";
+};
+
+const getOnEnterMessage = (
+  spec: GameSpec,
+  stateId: string,
+  state: GameState
+) => {
+  const node = spec.states[stateId];
+  if (!node?.on_enter?.messages?.length) {
+    return null;
+  }
+  const match = node.on_enter.messages.find((item) =>
+    evaluateExpression(item.visible, state)
+  );
+  return match?.message ?? null;
 };
 
 const DebugPanel = ({
@@ -60,6 +76,12 @@ const DebugPanel = ({
       (key) => !(key in variableSpecs)
     ),
   ] as VarPath[];
+  const stateKeys = [
+    ...Object.keys(spec.states),
+    ...(!spec.states[gameState.currentStateId]
+      ? [gameState.currentStateId]
+      : []),
+  ].sort();
 
   const updateFlag = (
     namespace: "persistent" | "daily",
@@ -86,6 +108,21 @@ const DebugPanel = ({
         [path]: value,
       },
     }));
+  };
+
+  const updateCurrentState = (stateId: string) => {
+    setGameState((prev) => {
+      const nextState = {
+        ...prev,
+        currentStateId: stateId,
+        message: null,
+      };
+      return {
+        ...nextState,
+        message: getOnEnterMessage(spec, stateId, nextState),
+        isEnded: spec.meta.loop.end_states.includes(stateId),
+      };
+    });
   };
 
   return (
@@ -124,6 +161,30 @@ const DebugPanel = ({
         </header>
 
         <div className="debugBody">
+          <section className="debugSection">
+            <h3>Current scene</h3>
+            <div className="debugGrid">
+              <label className="debugItem">
+                <span>Scene</span>
+                <select
+                  value={gameState.currentStateId}
+                  onChange={(event) => updateCurrentState(event.target.value)}
+                >
+                  {stateKeys.map((stateId) => {
+                    const title = spec.states[stateId]?.title;
+                    const label = title
+                      ? `${stateId} — ${title}`
+                      : stateId;
+                    return (
+                      <option key={stateId} value={stateId}>
+                        {label}
+                      </option>
+                    );
+                  })}
+                </select>
+              </label>
+            </div>
+          </section>
           <section className="debugSection">
             <h3>Persistent flags</h3>
             <div className="debugGrid">

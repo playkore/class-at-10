@@ -152,7 +152,8 @@
 }
 
 .debugItem input[type="text"],
-.debugItem input[type="number"] {
+.debugItem input[type="number"],
+.debugItem select {
   width: 110px;
   border: 1px solid rgba(0, 255, 122, 0.2);
   border-radius: 8px;
