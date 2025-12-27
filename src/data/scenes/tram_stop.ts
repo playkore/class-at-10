@@ -8,10 +8,10 @@ const scene: StateNode = {
       name: "Двери трамвая",
       description: "Двери трамвая открыты",
       boundingBox: {
-        x: 0.4,
-        y: 0.3,
-        width: 0.2,
-        height: 0.5,
+        x: 0.51,
+        y: 0.36,
+        width: 0.16,
+        height: 0.3,
       },
       actions: [
         {

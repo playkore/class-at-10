@@ -129,7 +129,7 @@ const scene: StateNode = {
             },
             {
               if: {
-                or: ["daily.has_pass", "daily.has_coins"],
+                and: [{ not: "daily.has_pass" }, { not: "daily.has_coins" }],
               },
               effects: [
                 {
