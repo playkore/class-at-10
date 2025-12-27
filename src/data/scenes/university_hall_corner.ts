@@ -2,7 +2,7 @@ import { StateNode } from "../types";
 
 const scene: StateNode = {
   title: "Вестибюль: уголочек",
-  image: "scenes/university-hall/background.png",
+  image: "scenes/university-hall-corned/background.png",
   on_enter: {
     messages: [
       {
@@ -31,8 +31,7 @@ const scene: StateNode = {
       text: "Подремать",
       effects: [
         {
-          message:
-            "Задремать прямо тут — плохая идея… но глаза закрываются.",
+          message: "Задремать прямо тут — плохая идея... но глаза закрываются.",
         },
         {
           goto: "sleep_next_day",

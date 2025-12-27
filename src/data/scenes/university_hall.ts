@@ -52,46 +52,52 @@ const scene: StateNode = {
         },
       ],
     },
+  ],
+  objects: [
     {
-      text: "Присесть в уголочке",
-      effects: [
-        {
-          message: "Посижу, подожду ребят.",
-        },
-        {
-          goto: "university_hall_corner",
-        },
-      ],
-    },
-    {
-      text: "Константин",
-      guard: {
-        not: "daily.talked_konstantin_today",
+      name: "Парень",
+      description:
+        "Парень с тетрадями в руках стоит возле колонны. Кого-то ждет.",
+      boundingBox: {
+        x: 0.74,
+        y: 0.48,
+        width: 0.19,
+        height: 0.37,
       },
-      failed_effects: [
+      image: "scenes/university-hall/object-boy.png",
+      actions: [
         {
-          message: "Сегодня мы уже поговорили — он убежал сдавать.",
-        },
-      ],
-      effects: [
-        {
-          set: {
-            "daily.talked_konstantin_today": true,
-          },
-        },
-        {
-          goto: "talk_konstantin",
+          text: "Познакомиться",
+          effects: [
+            {
+              set: {
+                "daily.talked_konstantin_today": true,
+              },
+            },
+            {
+              goto: "university_hall_boy_close",
+            },
+          ],
         },
       ],
     },
     {
-      text: "Подремать",
-      effects: [
+      name: "Диванчик",
+      description: "Уютный диванчик у стены. Можно присесть и отдохнуть.",
+      boundingBox: {
+        x: 0,
+        y: 0.69,
+        width: 0.22,
+        height: 0.22,
+      },
+      actions: [
         {
-          message: "Глаза предательски закрываются…",
-        },
-        {
-          goto: "sleep_next_day",
+          text: "Присесть",
+          effects: [
+            {
+              goto: "university_hall_corner",
+            },
+          ],
         },
       ],
     },

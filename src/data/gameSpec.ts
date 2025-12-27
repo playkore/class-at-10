@@ -16,7 +16,7 @@ import university_outside from "./scenes/university_outside";
 import university_hall from "./scenes/university_hall";
 import university_hall_corner from "./scenes/university_hall_corner";
 import talk_konstantin from "./scenes/talk_konstantin";
-import konstantin_needs_change from "./scenes/konstantin_needs_change";
+import university_hall_boy_close from "./scenes/university_hall_boy_close";
 import konstantin_why_know from "./scenes/konstantin_why_know";
 import uni_toilet from "./scenes/uni_toilet";
 import uni_toilet_cabin from "./scenes/uni_toilet_cabin";
@@ -158,7 +158,7 @@ export const gameSpec: GameSpec = {
     university_hall,
     university_hall_corner,
     talk_konstantin,
-    konstantin_needs_change,
+    university_hall_boy_close,
     konstantin_why_know,
     uni_toilet,
     uni_toilet_cabin,
