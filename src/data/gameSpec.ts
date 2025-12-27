@@ -368,10 +368,10 @@ export const gameSpec: GameSpec = {
           name: "Ключи от дома",
           description: "Ключи от моей квартиры",
           boundingBox: {
-            x: 0.73,
-            y: 0.17,
-            width: 0.07,
-            height: 0.06,
+            x: 0.26,
+            y: 0.41,
+            width: 0.56,
+            height: 0.24,
           },
           actions: [
             {
@@ -394,7 +394,9 @@ export const gameSpec: GameSpec = {
             },
           ],
           image: "scenes/apartment-kitchen-bowl/object-keys.png",
-          visible: true,
+          visible: {
+            not: "daily.has_keys",
+          },
         },
       ],
       actions: [
@@ -512,9 +514,9 @@ export const gameSpec: GameSpec = {
           name: "Тетрадь и ручка",
           description: "Моя тетрадь и ручка для записей",
           boundingBox: {
-            x: 0.17,
-            y: 0.38,
-            width: 0.13,
+            x: 0.3,
+            y: 0.51,
+            width: 0.34,
             height: 0.09,
           },
           actions: [
@@ -529,7 +531,7 @@ export const gameSpec: GameSpec = {
               ],
             },
           ],
-          image: "",
+          image: "scenes/apartment-desk/object-notebook.png",
           visible: {
             not: "daily.has_notebook",
           },
@@ -538,10 +540,10 @@ export const gameSpec: GameSpec = {
           name: "Одежда",
           description: "Моя одежда на сегодня",
           boundingBox: {
-            x: 0,
-            y: 0.53,
-            width: 0.51,
-            height: 0.31,
+            x: 0.03,
+            y: 0.6,
+            width: 0.52,
+            height: 0.23,
           },
           actions: [
             {
@@ -610,10 +612,10 @@ export const gameSpec: GameSpec = {
           name: "Россыпь монет",
           description: "Немного мелочи на подоконнике",
           boundingBox: {
-            x: 0.14,
-            y: 0.3,
-            width: 0.11,
-            height: 0.05,
+            x: 0.54,
+            y: 0.65,
+            width: 0.24,
+            height: 0.06,
           },
           actions: [
             {
@@ -636,7 +638,9 @@ export const gameSpec: GameSpec = {
             },
           ],
           image: "scenes/apartment-curtains-open/object-coins.png",
-          visible: true,
+          visible: {
+            not: "daily.has_coins",
+          },
         },
       ],
       actions: [
