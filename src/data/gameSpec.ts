@@ -111,7 +111,7 @@ export const gameSpec: GameSpec = {
   states: {
     darkness_start: {
       title: "Темнота",
-      image: "scenes/darkness.png",
+      image: "scenes/darkness/background.png",
       actions: [
         {
           text: "Открыть глаза",
@@ -126,7 +126,7 @@ export const gameSpec: GameSpec = {
     },
     room_bed_view_ringing_alarm: {
       title: "Будильник звонит",
-      image: "scenes/darkness.png",
+      image: "scenes/alarm-ringing/background.png",
       objects: [
         {
           id: "alarm_clock",
@@ -148,14 +148,14 @@ export const gameSpec: GameSpec = {
               ],
             },
           ],
-          image: "scenes/alarm-ringing.png",
+          image: "",
           visible: true,
         },
       ],
     },
     room_bed_view_muted_alarm: {
       title: "Будильник замолк",
-      image: "scenes/alarm-muted.png",
+      image: "scenes/alarm-muted/background.png",
       actions: [
         {
           text: "Встать",
@@ -178,7 +178,7 @@ export const gameSpec: GameSpec = {
     },
     corridor: {
       title: "Коридор, вид на ванну с туалетом",
-      image: "scenes/corridor.png",
+      image: "scenes/apartment-corridor/background.png",
       objects: [
         {
           id: "bathroom_door",
@@ -200,7 +200,7 @@ export const gameSpec: GameSpec = {
               ],
             },
           ],
-          image: "objects/door.png",
+          image: "",
           visible: true,
         },
         {
@@ -233,7 +233,7 @@ export const gameSpec: GameSpec = {
               ],
             },
           ],
-          image: "objects/door.png",
+          image: "",
           visible: true,
         },
       ],
@@ -308,7 +308,7 @@ export const gameSpec: GameSpec = {
     },
     bathroom: {
       title: "Ванная",
-      image: "scenes/darkness.png",
+      image: "scenes/apartment-corridor/background.png",
       actions: [
         {
           text: "Выйти",
@@ -338,9 +338,79 @@ export const gameSpec: GameSpec = {
         },
       ],
     },
+    kitchen: {
+      title: "Кухня",
+      image: "scenes/apartment-kitchen/background.png",
+      actions: [
+        {
+          text: "Посмотреть на миску",
+          effects: [
+            {
+              goto: "kitchen_bowl",
+            },
+          ],
+        },
+        {
+          text: "Выйти в коридор",
+          effects: [
+            {
+              goto: "corridor",
+            },
+          ],
+        },
+      ],
+    },
+    kitchen_bowl: {
+      title: "Кухня: миска",
+      image: "scenes/apartment-kitchen-bowl/background.png",
+      objects: [
+        {
+          name: "Ключи от дома",
+          description: "Ключи от моей квартиры",
+          boundingBox: {
+            x: 0.73,
+            y: 0.17,
+            width: 0.07,
+            height: 0.06,
+          },
+          actions: [
+            {
+              text: "Взять",
+              guard: {
+                not: "daily.has_keys",
+              },
+              failed_effects: [
+                {
+                  message: "Ключи уже у меня.",
+                },
+              ],
+              effects: [
+                {
+                  set: {
+                    "daily.has_keys": true,
+                  },
+                },
+              ],
+            },
+          ],
+          image: "scenes/apartment-kitchen-bowl/object-keys.png",
+          visible: true,
+        },
+      ],
+      actions: [
+        {
+          text: "Назад",
+          effects: [
+            {
+              goto: "kitchen",
+            },
+          ],
+        },
+      ],
+    },
     room_desk_view: {
       title: "Комната, вид на стол",
-      image: "scenes/apartment-desk.png",
+      image: "scenes/apartment-desk/background.png",
       objects: [
         {
           name: "Расписание занятий",
@@ -366,7 +436,7 @@ export const gameSpec: GameSpec = {
               ],
             },
           ],
-          image: "objects/schedule.png",
+          image: "",
           visible: true,
         },
         {
@@ -401,7 +471,7 @@ export const gameSpec: GameSpec = {
               ],
             },
           ],
-          image: "objects/wardrobe.png",
+          image: "",
           visible: true,
         },
         {
@@ -435,7 +505,7 @@ export const gameSpec: GameSpec = {
               ],
             },
           ],
-          image: "objects/makeup_bag.png",
+          image: "",
           visible: true,
         },
         {
@@ -459,61 +529,9 @@ export const gameSpec: GameSpec = {
               ],
             },
           ],
-          image: "objects/notebook.png",
+          image: "",
           visible: {
             not: "daily.has_notebook",
-          },
-        },
-        {
-          name: "Россыпь монет",
-          description: "Немного мелочи на столе",
-          boundingBox: {
-            x: 0.14,
-            y: 0.3,
-            width: 0.11,
-            height: 0.05,
-          },
-          actions: [
-            {
-              text: "Взять",
-              effects: [
-                {
-                  set: {
-                    "daily.has_coins": true,
-                  },
-                },
-              ],
-            },
-          ],
-          image: "objects/coins.png",
-          visible: {
-            not: "daily.has_coins",
-          },
-        },
-        {
-          name: "Ключи от дома",
-          description: "Ключи от моей квартиры",
-          boundingBox: {
-            x: 0.73,
-            y: 0.17,
-            width: 0.07,
-            height: 0.06,
-          },
-          actions: [
-            {
-              text: "Взять",
-              effects: [
-                {
-                  set: {
-                    "daily.has_keys": true,
-                  },
-                },
-              ],
-            },
-          ],
-          image: "objects/keys.png",
-          visible: {
-            not: "daily.has_keys",
           },
         },
         {
@@ -537,7 +555,7 @@ export const gameSpec: GameSpec = {
               ],
             },
           ],
-          image: "scenes/apartment-desk-clothes.png",
+          image: "scenes/apartment-desk/object-clothes.png",
           visible: {
             not: "daily.is_dressed",
           },
@@ -562,9 +580,87 @@ export const gameSpec: GameSpec = {
         },
       ],
     },
+    room_curtains_closed: {
+      title: "Комната, вид на окно",
+      image: "scenes/apartment-curtains/background.png",
+      actions: [
+        {
+          text: "Раздвинуть шторы",
+          effects: [
+            {
+              goto: "room_curtains_open",
+            },
+          ],
+        },
+        {
+          text: "Назад к столу",
+          effects: [
+            {
+              goto: "room_desk_view",
+            },
+          ],
+        },
+      ],
+    },
+    room_curtains_open: {
+      title: "Комната, окно открыто",
+      image: "scenes/apartment-curtains-open/background.png",
+      objects: [
+        {
+          name: "Россыпь монет",
+          description: "Немного мелочи на подоконнике",
+          boundingBox: {
+            x: 0.14,
+            y: 0.3,
+            width: 0.11,
+            height: 0.05,
+          },
+          actions: [
+            {
+              text: "Взять",
+              guard: {
+                not: "daily.has_coins",
+              },
+              failed_effects: [
+                {
+                  message: "Монетки уже у меня.",
+                },
+              ],
+              effects: [
+                {
+                  set: {
+                    "daily.has_coins": true,
+                  },
+                },
+              ],
+            },
+          ],
+          image: "scenes/apartment-curtains-open/object-coins.png",
+          visible: true,
+        },
+      ],
+      actions: [
+        {
+          text: "Задвинуть шторы",
+          effects: [
+            {
+              goto: "room_curtains_closed",
+            },
+          ],
+        },
+        {
+          text: "Назад к столу",
+          effects: [
+            {
+              goto: "room_desk_view",
+            },
+          ],
+        },
+      ],
+    },
     room_desk_drawer_open: {
       title: "Ящик стола",
-      image: "scenes/apartment-desk-drawer.png",
+      image: "scenes/apartment-desk-drawer/background.png",
       objects: [
         {
           name: "Проездной",
@@ -590,7 +686,7 @@ export const gameSpec: GameSpec = {
               ],
             },
           ],
-          image: "scenes/apartment-desk-drawer-ticket.png",
+          image: "scenes/apartment-desk-drawer/object-ticket.png",
           visible: {
             not: "daily.has_pass",
           },
@@ -609,7 +705,7 @@ export const gameSpec: GameSpec = {
     },
     tram_stop: {
       title: "Улица, остановка. Трамвай остановился, открыл двери",
-      image: "scenes/tram_stop.png",
+      image: "scenes/tram-stop/background.png",
       objects: [
         {
           name: "Двери трамвая",
@@ -630,14 +726,14 @@ export const gameSpec: GameSpec = {
               ],
             },
           ],
-          image: "public/scenes/tram-stop.png",
+          image: "",
           visible: true,
         },
       ],
     },
     tram_inside: {
       title: "В трамвае, виден кондуктор",
-      image: "scenes/tram_interior.png",
+      image: "scenes/tram-inside/background.png",
       objects: [
         {
           name: "Кондуктор",
@@ -689,13 +785,13 @@ export const gameSpec: GameSpec = {
               ],
             },
           ],
-          image: "scenes/tram-inside.png",
+          image: "",
         },
       ],
     },
     university_outside: {
       title: "Университет, на улице",
-      image: "scenes/university-entrance.png",
+      image: "scenes/university-entrance/background.png",
       actions: [
         {
           text: "Войти внутрь",
@@ -709,7 +805,7 @@ export const gameSpec: GameSpec = {
     },
     university_hall: {
       title: "Вестибюль университета",
-      image: "scenes/university-hall.png",
+      image: "scenes/university-hall/background.png",
       on_enter: {
         messages: [
           {
@@ -806,7 +902,7 @@ export const gameSpec: GameSpec = {
     },
     university_hall_corner: {
       title: "Вестибюль: уголочек",
-      image: "scenes/university-hall.png",
+      image: "scenes/university-hall/background.png",
       on_enter: {
         messages: [
           {
@@ -847,7 +943,7 @@ export const gameSpec: GameSpec = {
     },
     talk_konstantin: {
       title: "Диалог: Константин в вестибюле",
-      image: "scenes/university-hall-boy.png",
+      image: "scenes/university-hall/background.png",
       actions: [
         {
           text: "А позвонить?",
@@ -869,7 +965,7 @@ export const gameSpec: GameSpec = {
     },
     konstantin_needs_change: {
       title: 'Константин: "У меня только пятерка. Не разменяешь?"',
-      image: "scenes/university-hall-boy-close.png",
+      image: "scenes/university-hall-boy-close/background.png",
       actions: [
         {
           text: "Отдать рубль",
@@ -933,7 +1029,7 @@ export const gameSpec: GameSpec = {
     },
     konstantin_why_know: {
       title: 'Константин: "Откуда ты знаешь?"',
-      image: "scenes/university-hall-boy-close.png",
+      image: "scenes/university-hall-boy-close/background.png",
       actions: [
         {
           text: "Женская интуиция. Иди один сдавай.",
@@ -950,7 +1046,7 @@ export const gameSpec: GameSpec = {
     },
     uni_toilet: {
       title: "Туалет (университет)",
-      image: "scenes/toilet.png",
+      image: "scenes/toilet/background.png",
       actions: [
         {
           text: "Сходить",
@@ -1001,7 +1097,7 @@ export const gameSpec: GameSpec = {
     },
     uni_toilet_cabin: {
       title: "Туалет (кабинка)",
-      image: "scenes/toilet-cabin.png",
+      image: "scenes/toilet-cabin/background.png",
       actions: [
         {
           text: "Осмотреться",
@@ -1023,7 +1119,7 @@ export const gameSpec: GameSpec = {
     },
     natasha_notebook: {
       title: "Забытая тетрадь",
-      image: "scenes/toilet-cabin-notebook.png",
+      image: "scenes/toilet-cabin/background.png",
       actions: [
         {
           text: "Посмотреть",
@@ -1069,7 +1165,7 @@ export const gameSpec: GameSpec = {
     },
     lecture_hall: {
       title: "Аудитория",
-      image: "scenes/class.png",
+      image: "scenes/class/background.png",
       actions: [
         {
           text: "Сесть к Наташе",
@@ -1091,7 +1187,7 @@ export const gameSpec: GameSpec = {
     },
     with_natasha: {
       title: "Сидеть с Наташей",
-      image: "scenes/class-friend-close.png",
+      image: "scenes/class-friend-close/background.png",
       actions: [
         {
           text: "Отдать тетрадь (если есть)",
@@ -1214,7 +1310,7 @@ export const gameSpec: GameSpec = {
     },
     alone: {
       title: "Сидеть в одиночестве",
-      image: "scenes/class.png",
+      image: "scenes/class/background.png",
       actions: [
         {
           text: "Закрыть глаза, задремать",
@@ -1231,7 +1327,7 @@ export const gameSpec: GameSpec = {
     },
     cafeteria: {
       title: "Буфет",
-      image: "scenes/university-cafe.png",
+      image: "scenes/university-cafe/background.png",
       actions: [
         {
           text: "Константин (вернуть рубль)",
@@ -1293,7 +1389,7 @@ export const gameSpec: GameSpec = {
     },
     cafeteria_true_ending_dialog: {
       title: "Буфет: развязка",
-      image: "scenes/university-cafe-boy.png",
+      image: "scenes/university-cafe/background.png",
       actions: [
         {
           text: "Заговорить",
@@ -1311,7 +1407,7 @@ export const gameSpec: GameSpec = {
     },
     sleep_next_day: {
       title: "Темнота → следующий день",
-      image: "scenes/darkness.png",
+      image: "scenes/darkness/background.png",
       on_enter: {
         messages: [
           {
