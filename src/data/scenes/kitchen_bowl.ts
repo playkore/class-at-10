@@ -19,18 +19,15 @@ const scene: StateNode = {
           guard: {
             not: "daily.has_keys",
           },
-          failed_effects: [
-            {
-              message: "Ключи уже у меня.",
+          failed_effects: {
+            message: "Ключи уже у меня.",
+          },
+
+          effects: {
+            set: {
+              "daily.has_keys": true,
             },
-          ],
-          effects: [
-            {
-              set: {
-                "daily.has_keys": true,
-              },
-            },
-          ],
+          },
         },
       ],
       image: "scenes/apartment-kitchen-bowl/object-keys.png",
@@ -42,11 +39,9 @@ const scene: StateNode = {
   actions: [
     {
       text: "Назад",
-      effects: [
-        {
-          goto: "kitchen",
-        },
-      ],
+      effects: {
+        goto: "kitchen",
+      },
     },
   ],
 };

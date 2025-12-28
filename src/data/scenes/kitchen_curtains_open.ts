@@ -19,18 +19,15 @@ const scene: StateNode = {
           guard: {
             not: "daily.has_coins",
           },
-          failed_effects: [
-            {
-              message: "Монетки уже у меня.",
+          failed_effects: {
+            message: "Монетки уже у меня.",
+          },
+
+          effects: {
+            set: {
+              "daily.has_coins": true,
             },
-          ],
-          effects: [
-            {
-              set: {
-                "daily.has_coins": true,
-              },
-            },
-          ],
+          },
         },
       ],
       image: "scenes/apartment-curtains-open/object-coins.png",
@@ -42,19 +39,15 @@ const scene: StateNode = {
   actions: [
     {
       text: "Задвинуть шторы",
-      effects: [
-        {
-          goto: "kitchen_curtains_closed",
-        },
-      ],
+      effects: {
+        goto: "kitchen_curtains_closed",
+      },
     },
     {
       text: "Назад",
-      effects: [
-        {
-          goto: "kitchen",
-        },
-      ],
+      effects: {
+        goto: "kitchen",
+      },
     },
   ],
 };

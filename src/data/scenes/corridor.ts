@@ -40,21 +40,18 @@ const scene: StateNode = {
       actions: [
         {
           text: "Открыть",
-          effects: [
-            {
-              set: {
-                "daily.used_toilet_home": true,
-              },
+          effects: {
+            set: {
+              "daily.used_toilet_home": true,
             },
-          ],
+          },
+
           guard: {
             not: "daily.used_toilet_home",
           },
-          failed_effects: [
-            {
-              message: "Я больше не хочу.",
-            },
-          ],
+          failed_effects: {
+            message: "Я больше не хочу.",
+          },
         },
       ],
       image: "",
@@ -73,11 +70,9 @@ const scene: StateNode = {
       actions: [
         {
           text: "Зайти",
-          effects: [
-            {
-              goto: "kitchen",
-            },
-          ],
+          effects: {
+            goto: "kitchen",
+          },
         },
       ],
       image: "",
@@ -101,48 +96,38 @@ const scene: StateNode = {
               if: {
                 not: "daily.has_keys",
               },
-              effects: [
-                {
-                  message: "А домой я как попаду? Ключи не взяла!",
-                },
-              ],
+              effects: {
+                message: "А домой я как попаду? Ключи не взяла!",
+              },
             },
             {
               if: {
                 not: "daily.has_notebook",
               },
-              effects: [
-                {
-                  message: "А писать я в чем в институте буду?",
-                },
-              ],
+              effects: {
+                message: "А писать я в чем в институте буду?",
+              },
             },
             {
               if: {
                 not: "daily.is_dressed",
               },
-              effects: [
-                {
-                  message: "Как я на улицу пойду в таком виде?",
-                },
-              ],
+              effects: {
+                message: "Как я на улицу пойду в таком виде?",
+              },
             },
             {
               if: {
                 and: [{ not: "daily.has_pass" }, { not: "daily.has_coins" }],
               },
-              effects: [
-                {
-                  message: "Как я на трамвае поеду, зайцем?",
-                },
-              ],
+              effects: {
+                message: "Как я на трамвае поеду, зайцем?",
+              },
             },
           ],
-          effects: [
-            {
-              goto: "tram_stop",
-            },
-          ],
+          effects: {
+            goto: "tram_stop",
+          },
         },
       ],
       image: "",
@@ -152,11 +137,9 @@ const scene: StateNode = {
   actions: [
     {
       text: "Вернуться в комнату",
-      effects: [
-        {
-          goto: "room_desk_view",
-        },
-      ],
+      effects: {
+        goto: "room_desk_view",
+      },
     },
   ],
 };

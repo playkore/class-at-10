@@ -66,7 +66,7 @@ export type BooleanExpression =
 // A dialog option on the screen to select, similar to a button
 export type DialogOption = {
   text: string;
-  effects: Effect[];
+  effects: Effects;
   visible?: BooleanExpression;
 };
 
@@ -89,7 +89,7 @@ export interface StateNode {
 
 export interface TerminalNode {
   title: string;
-  effects?: Effect[];
+  effects?: Effects;
 }
 
 export interface ConditionalMessage {
@@ -103,7 +103,7 @@ export interface OnEnter {
 
 export type ConditionalGuard = {
   if: BooleanExpression;
-  effects: Effect[];
+  effects: Effects;
 };
 
 export interface ActionDef {
@@ -114,9 +114,9 @@ export interface ActionDef {
   // Optional guard for a single conditional action (e.g. object actions).
   guard?: BooleanExpression;
   // Effects to apply when the action is taken.
-  effects: Effect[];
+  effects: Effects;
   // Effects to apply when the guard fails.
-  failed_effects?: Effect[];
+  failed_effects?: Effects;
   // If none of the guards fail, the effects are applied.
   // Otherwise, the effects from the first failed guard are applied.
   guards?: ConditionalGuard[];
@@ -126,29 +126,17 @@ export interface ChoiceDef {
   id?: ChoiceId;
   text: string;
   goto?: StateId;
-  effects?: Effect[];
+  effects?: Effects;
   message?: string;
 }
 
-// TODO delete it
-export interface OnFail {
-  stay?: boolean;
+export type Effects = {
+  set?: Record<ValuePath, Value>;
+  inc?: Record<VarPath, number>;
+  reset?: "daily_flags" | "persistent_flags";
+  end?: true;
   message?: string;
-  message_by_first_failed_guard?: Record<string, string>;
-}
-
-// TODO delete it
-export interface IfThenElse {
-  then: { effects?: Effect[]; message?: string };
-  else?: { effects?: Effect[]; message?: string };
-}
-
-export type Effect =
-  | { set: Record<ValuePath, Value> }
-  | { inc: Record<VarPath, number> }
-  | { reset: "daily_flags" | "persistent_flags" }
-  | { end: true }
-  | { message: string }
-  | { goto: StateId }
-  | { add_dialog_line: string }
-  | { dialog_options: DialogOption[] };
+  goto?: StateId;
+  add_dialog_lines?: string[];
+  dialog_options?: DialogOption[];
+};

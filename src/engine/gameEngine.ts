@@ -1,7 +1,7 @@
 import type {
   ActionDef,
   ActionId,
-  Effect,
+  Effects,
   GameSpec,
   StateId,
   StateNode,
@@ -144,48 +144,36 @@ const applyGoto = (state: GameState, spec: GameSpec, target?: StateId) => {
   }
 };
 
-const applyEffects = (state: GameState, spec: GameSpec, effects?: Effect[]) => {
+const applyEffects = (state: GameState, spec: GameSpec, effects?: Effects) => {
   if (!effects) {
     return;
   }
-  for (const effect of effects) {
-    if ("noop" in effect) {
-      continue;
+  if (effects.reset === "daily_flags") {
+    state.flags.daily = buildFlagState(spec, "daily_flags");
+  }
+  if (effects.reset === "persistent_flags") {
+    state.flags.persistent = buildFlagState(spec, "persistent_flags");
+  }
+  if (effects.set) {
+    for (const [path, value] of Object.entries(effects.set)) {
+      setFlagValue(state, path as ValuePath, value);
     }
-    if ("set" in effect) {
-      for (const [path, value] of Object.entries(effect.set)) {
-        setFlagValue(state, path as ValuePath, value);
-      }
-      continue;
+  }
+  if (effects.inc) {
+    for (const [path, value] of Object.entries(effects.inc)) {
+      const current = state.variables[path as VarPath];
+      const base = typeof current === "number" ? current : 0;
+      state.variables[path as VarPath] = base + value;
     }
-    if ("inc" in effect) {
-      for (const [path, value] of Object.entries(effect.inc)) {
-        const current = state.variables[path as VarPath];
-        const base = typeof current === "number" ? current : 0;
-        state.variables[path as VarPath] = base + value;
-      }
-      continue;
-    }
-    if ("reset" in effect) {
-      if (effect.reset === "daily_flags") {
-        state.flags.daily = buildFlagState(spec, "daily_flags");
-      }
-      if (effect.reset === "persistent_flags") {
-        state.flags.persistent = buildFlagState(spec, "persistent_flags");
-      }
-      continue;
-    }
-    if ("message" in effect) {
-      state.message = effect.message;
-      continue;
-    }
-    if ("goto" in effect) {
-      applyGoto(state, spec, effect.goto);
-      continue;
-    }
-    if ("end" in effect) {
-      state.isEnded = true;
-    }
+  }
+  if (effects.message) {
+    state.message = effects.message;
+  }
+  if (effects.goto) {
+    applyGoto(state, spec, effects.goto);
+  }
+  if (effects.end) {
+    state.isEnded = true;
   }
 };
 

@@ -7,58 +7,41 @@ const scene: StateNode = {
     {
       text: "Константин (вернуть рубль)",
       guard: "persistent.lent_ruble",
-      failed_effects: [
-        {
-          message: "Без рубля мы и не перекинулись бы словом.",
+      failed_effects: {
+        message: "Без рубля мы и не перекинулись бы словом.",
+      },
+
+      effects: {
+        set: {
+          "persistent.met_konstantin_in_cafeteria": true,
         },
-      ],
-      effects: [
-        {
-          set: {
-            "persistent.met_konstantin_in_cafeteria": true,
-          },
-        },
-        {
-          message:
-            "О, хорошо, что ты тут! Я разменял пятерку, вот твой рубль… Дозвонился. Они не придут. Бухали вчера в общаге…",
-        },
-        {
-          goto: "cafeteria",
-        },
-      ],
+        message:
+          "О, хорошо, что ты тут! Я разменял пятерку, вот твой рубль… Дозвонился. Они не придут. Бухали вчера в общаге…",
+        goto: "cafeteria",
+      },
     },
     {
       text: "Константин (спросить, как сдал)",
       guard: "persistent.told_friends_wont_come",
-      failed_effects: [
-        {
-          message: "Пока рано — он всё ещё переживает в вестибюле.",
-        },
-      ],
-      effects: [
-        {
-          goto: "cafeteria_true_ending_dialog",
-        },
-      ],
+      failed_effects: {
+        message: "Пока рано — он всё ещё переживает в вестибюле.",
+      },
+      effects: {
+        goto: "cafeteria_true_ending_dialog",
+      },
     },
     {
       text: "Вернуться в вестибюль",
-      effects: [
-        {
-          goto: "university_hall",
-        },
-      ],
+      effects: {
+        goto: "university_hall",
+      },
     },
     {
       text: "Сесть, задремать",
-      effects: [
-        {
-          message: "В буфете тепло и сон клонит…",
-        },
-        {
-          goto: "sleep_next_day",
-        },
-      ],
+      effects: {
+        message: "В буфете тепло и сон клонит…",
+        goto: "sleep_next_day",
+      },
     },
   ],
 };

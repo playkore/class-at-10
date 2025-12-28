@@ -7,60 +7,38 @@ const scene: StateNode = {
     {
       text: "Отдать рубль",
       guard: "daily.has_coins",
-      failed_effects: [
-        {
-          message: "Если бы… У меня совсем нет мелочи.",
+      failed_effects: {
+        message: "Если бы… У меня совсем нет мелочи.",
+      },
+
+      effects: {
+        set: {
+          "persistent.lent_ruble": true,
+          "daily.has_coins": false,
         },
-      ],
-      effects: [
-        {
-          set: {
-            "persistent.lent_ruble": true,
-          },
-        },
-        {
-          set: {
-            "daily.has_coins": false,
-          },
-        },
-        {
-          message: "Спасибо! Разменяю и обязательно верну.",
-        },
-        {
-          goto: "university_hall",
-        },
-      ],
+        message: "Спасибо! Разменяю и обязательно верну.",
+        goto: "university_hall",
+      },
     },
     {
       text: "Извини, я дома деньги оставила",
-      effects: [
-        {
-          message:
-            "Жаль. Ладно, пойду один сдавать. Я уже и так опоздал… Пока!",
-        },
-        {
-          goto: "university_hall",
-        },
-      ],
+      effects: {
+        message: "Жаль. Ладно, пойду один сдавать. Я уже и так опоздал… Пока!",
+        goto: "university_hall",
+      },
     },
     {
       text: "Они не придут (если слышала о тусовке)",
       guard: "persistent.met_konstantin_in_cafeteria",
-      failed_effects: [
-        {
-          message: "Откуда мне это знать? Надо сначала что-то услышать.",
+      failed_effects: {
+        message: "Откуда мне это знать? Надо сначала что-то услышать.",
+      },
+      effects: {
+        set: {
+          "persistent.told_friends_wont_come": true,
         },
-      ],
-      effects: [
-        {
-          set: {
-            "persistent.told_friends_wont_come": true,
-          },
-        },
-        {
-          goto: "konstantin_why_know",
-        },
-      ],
+        goto: "konstantin_why_know",
+      },
     },
   ],
 };

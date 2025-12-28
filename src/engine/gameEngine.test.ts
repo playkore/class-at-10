@@ -52,7 +52,7 @@ const baseSpec = (actions: ActionDef[]): GameSpec => ({
   terminals: {
     end: {
       title: "End",
-      effects: [{ set: { "persistent.p1": false } }, { end: true }],
+      effects: { set: { "persistent.p1": false }, end: true },
     },
   },
 });
@@ -87,8 +87,8 @@ describe("applyAction", () => {
       {
         text: "Travel",
         guard: "daily.d1",
-        failed_effects: [{ message: "Need a pass" }],
-        effects: [{ goto: "middle" }],
+        failed_effects: { message: "Need a pass" },
+        effects: { goto: "middle" },
       },
     ]);
 
@@ -106,10 +106,10 @@ describe("applyAction", () => {
         guards: [
           {
             if: "persistent.p1",
-            effects: [{ message: "Handled by guard" }],
+            effects: { message: "Handled by guard" },
           },
         ],
-        effects: [{ set: { "daily.d1": true } }],
+        effects: { set: { "daily.d1": true } },
       },
     ]);
 
@@ -124,7 +124,7 @@ describe("applyAction", () => {
     const spec = baseSpec([
       {
         text: "Finish",
-        effects: [{ set: { "daily.d1": true } }, { goto: "end" }],
+        effects: { set: { "daily.d1": true }, goto: "end" },
       },
     ]);
 
@@ -140,7 +140,7 @@ describe("applyAction", () => {
 
 describe("buildActionLabel", () => {
   it("falls back to id when text is blank", () => {
-    expect(buildActionLabel(2, { text: "  ", effects: [] })).toBe("2");
-    expect(buildActionLabel(2, { text: "Rest", effects: [] })).toBe("Rest");
+    expect(buildActionLabel(2, { text: "  ", effects: {} })).toBe("2");
+    expect(buildActionLabel(2, { text: "Rest", effects: {} })).toBe("Rest");
   });
 });
