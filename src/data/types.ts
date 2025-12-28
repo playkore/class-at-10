@@ -63,6 +63,22 @@ export type BooleanExpression =
   | boolean
   | ValuePath;
 
+// Dialogs
+export type SpeakerId = "protagonist" | "natasha" | "konstantin";
+
+// A single line of dialog spoken by a character
+export interface DialogLine {
+  speaker: SpeakerId;
+  text: string;
+  // true by default
+  // visible?: BooleanExpression;
+}
+
+// A dialog option on the screen to select, similar to a button
+export type DialogOption = {
+  text: string;
+  effects: Effect[];
+}
 
 export interface SceneObject {
   id?: string;
@@ -115,7 +131,7 @@ export interface ActionDef {
   // Otherwise, the effects from the first failed guard are applied.
   guards?: ConditionalGuard[];
 }
-
+// TODO delete it
 export interface ChoiceDef {
   id?: ChoiceId;
   text: string;
@@ -124,24 +140,18 @@ export interface ChoiceDef {
   message?: string;
 }
 
+// TODO delete it
 export interface OnFail {
   stay?: boolean;
   message?: string;
   message_by_first_failed_guard?: Record<string, string>;
 }
 
+// TODO delete it
 export interface IfThenElse {
   then: { effects?: Effect[]; message?: string };
   else?: { effects?: Effect[]; message?: string };
 }
-
-// export type Guard =
-//   | ValuePath
-//   | { flag: string }
-//   | { not_flag: string }
-//   | { not: Guard }
-//   | { gte: [ValuePath | number, number] }
-//   | { any: Guard[] };
 
 export type Effect =
   | { set: Record<ValuePath, Value> }
@@ -149,4 +159,6 @@ export type Effect =
   | { reset: "daily_flags" | "persistent_flags" }
   | { end: true }
   | { message: string }
-  | { goto: StateId };
+  | { goto: StateId }
+  | { dialogue_lines: DialogLine[] }
+  | { dialogue_options: DialogOption[] };
