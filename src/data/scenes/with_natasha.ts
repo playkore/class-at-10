@@ -5,72 +5,71 @@ const scene: StateNode = {
   image: "scenes/class-friend-close/background.png",
   actions: [
     {
-      text: "Отдать тетрадь",
-      guards: [
-        {
-          if: {
-            not: "daily.found_natasha_notebook",
-          },
-          effects: [
-            {
-              message: "Нечего отдавать — пустые руки.",
-            },
-          ],
-        },
-        {
-          if: "daily.returned_natasha_notebook_today",
-          effects: [
-            {
-              message: "Я уже отдала её сегодня.",
-            },
-          ],
-        },
-      ],
+      text: "Поговорить",
       effects: [
         {
-          set: {
-            "daily.returned_natasha_notebook_today": true,
-          },
-        },
-        {
-          set: {
-            "persistent.natasha_owes": true,
-          },
-        },
-        {
-          message: "Ой! Моя! Спасибо тебе!",
-        },
-      ],
-      visible: {
-        and: [
-          "daily.found_natasha_notebook",
-          { not: "daily.returned_natasha_notebook_today" },
-        ],
-      },
-    },
-    {
-      text: "Попросить списать вчерашнюю лекцию",
-      visible: {
-        and: ["daily.returned_natasha_notebook_today"],
-      },
-      guards: [
-        {
-          if: { not: "daily.got_lecture_notebook_today" },
-          effects: [
+          dialog_options: [
             {
-              message: "Странно, мне кажется я забыла тетрадь дома...",
+              text: "Наташа, у тебя случайно нет вчераней лекции по возрастной?",
+              visible: { not: "daily.returned_natasha_notebook_today" },
+              effects: [
+                {
+                  dialog_lines: [
+                    {
+                      speaker: "natasha",
+                      text: "Кажется, я забыла тетрадь дома...",
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              text: "Я нашла твою тетрадь по возрастной в туалете.",
+              visible: {
+                and: [
+                  "daily.found_natasha_notebook",
+                  { not: "daily.returned_natasha_notebook_today" },
+                ],
+              },
+              effects: [
+                {
+                  dialog_lines: [
+                    {
+                      speaker: "natasha",
+                      text: "Ой! Спасибо большое!",
+                    },
+                  ],
+                  set: {
+                    "daily.returned_natasha_notebook_today": true,
+                  },
+                  dialog_options: [
+                    {
+                      text: "Можно, кстати, списать у тебя вчерашнюю лекцию?",
+                      effects: [
+                        {
+                          dialog_lines: [
+                            {
+                              speaker: "natasha",
+                              text: "Конечно, держи.",
+                            },
+                            {
+                              speaker: "protagonist",
+                              text: "Спасибо! Я тогда пойду в буфет на полпары, чтобы списать.",
+                            },
+                          ],
+                        },
+                        {
+                          set: {
+                            "daily.got_lecture_notebook_today": true,
+                          },
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
             },
           ],
-        },
-      ],
-      effects: [
-        {
-          set: {
-            "daily.got_lecture_notebook_today": true,
-          },
-        },
-        {
-          message: "Наташа отдает тетрадь. Ура. Надо сесть в буфете и списать.",
         },
       ],
     },
@@ -103,3 +102,45 @@ const scene: StateNode = {
 };
 
 export default scene;
+
+/*
+
+Логика диалога
+
+(если протоганист НЕ отдал тетрадь сегодня)
+Протоганист: Наташа, у тебя случайно нет вчераней лекции по возрастной?
+Наташа: Кажется, я забыла тетрадь дома...
+
+(если протоганист отдал тетрадь сегодня)
+Протоганист: Я нашла твою тетрадь по возрастной в туалете.
+Наташа: Ой! Спасибо большое! 
+Протоганист: Можно, кстати, списать у тебя вчерашнюю лекцию?
+Наташа: Конечно, держи.
+Протоганист: Спасибо! Я тогда пойду в буфет на полпары, чтобы списать.
+
+
+question
+    answer
+      question1
+        answer1
+      question2
+        effects:
+          set: { some_flag: true }
+          dialog_line: {
+            text: "answer2"
+            speaker: "natasha"
+          }
+          options: [
+            {
+              text: "question3",
+              effects: [
+                {
+                  set: { another_flag: true }
+              answer3
+            question4
+              answer4
+            }
+          ]
+        }
+        
+ */

@@ -70,15 +70,14 @@ export type SpeakerId = "protagonist" | "natasha" | "konstantin";
 export interface DialogLine {
   speaker: SpeakerId;
   text: string;
-  // true by default
-  // visible?: BooleanExpression;
 }
 
 // A dialog option on the screen to select, similar to a button
 export type DialogOption = {
   text: string;
   effects: Effect[];
-}
+  visible?: BooleanExpression;
+};
 
 export interface SceneObject {
   id?: string;
@@ -160,5 +159,5 @@ export type Effect =
   | { end: true }
   | { message: string }
   | { goto: StateId }
-  | { dialogue_lines: DialogLine[] }
-  | { dialogue_options: DialogOption[] };
+  | { dialog_lines: DialogLine[] }
+  | { dialog_options: DialogOption[] };
