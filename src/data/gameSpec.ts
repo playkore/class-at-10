@@ -20,7 +20,6 @@ import university_hall_boy_close from "./scenes/university_hall_boy_close";
 import konstantin_why_know from "./scenes/konstantin_why_know";
 import uni_toilet from "./scenes/uni_toilet";
 import uni_toilet_cabin from "./scenes/uni_toilet_cabin";
-import natasha_notebook from "./scenes/natasha_notebook";
 import lecture_hall from "./scenes/lecture_hall";
 import with_natasha from "./scenes/with_natasha";
 import alone from "./scenes/alone";
@@ -162,7 +161,6 @@ export const gameSpec: GameSpec = {
     konstantin_why_know,
     uni_toilet,
     uni_toilet_cabin,
-    natasha_notebook,
     lecture_hall,
     with_natasha,
     alone,

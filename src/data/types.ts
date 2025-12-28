@@ -144,7 +144,7 @@ export interface IfThenElse {
 //   | { any: Guard[] };
 
 export type Effect =
-  | { set: Record<ValuePath, any> }
+  | { set: Record<ValuePath, Value> }
   | { inc: Record<VarPath, number> }
   | { reset: "daily_flags" | "persistent_flags" }
   | { end: true }
