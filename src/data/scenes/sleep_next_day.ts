@@ -14,19 +14,13 @@ const scene: StateNode = {
   actions: [
     {
       text: "Какой странный сон...",
-      effects: [
-        {
-          inc: {
-            "loop.day_index": 1,
-          },
+      effects: {
+        inc: {
+          "loop.day_index": 1,
         },
-        {
-          reset: "daily_flags",
-        },
-        {
-          goto: "darkness_start",
-        },
-      ],
+        reset: "daily_flags",
+        goto: "darkness_start",
+      },
     },
   ],
 };

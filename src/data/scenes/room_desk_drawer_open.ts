@@ -16,16 +16,12 @@ const scene: StateNode = {
       actions: [
         {
           text: "Забрать",
-          effects: [
-            {
-              set: {
-                "daily.has_pass": true,
-              },
+          effects: {
+            set: {
+              "daily.has_pass": true,
             },
-            {
-              message: "Проездной у меня.",
-            },
-          ],
+            message: "Проездной у меня.",
+          },
         },
       ],
       image: "scenes/apartment-desk-drawer/object-ticket.png",
@@ -37,11 +33,9 @@ const scene: StateNode = {
   actions: [
     {
       text: "Закрыть ящик",
-      effects: [
-        {
-          goto: "room_desk_view",
-        },
-      ],
+      effects: {
+        goto: "room_desk_view",
+      },
     },
   ],
 };

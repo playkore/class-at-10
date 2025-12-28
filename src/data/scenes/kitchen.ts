@@ -6,11 +6,9 @@ const scene: StateNode = {
   actions: [
     {
       text: "Вернуться в коридор",
-      effects: [
-        {
-          goto: "corridor",
-        },
-      ],
+      effects: {
+        goto: "corridor",
+      },
     },
   ],
   objects: [
@@ -28,11 +26,9 @@ const scene: StateNode = {
       actions: [
         {
           text: "Заглянуть в миску",
-          effects: [
-            {
-              goto: "kitchen_bowl",
-            },
-          ],
+          effects: {
+            goto: "kitchen_bowl",
+          },
         },
       ],
     },
@@ -49,11 +45,9 @@ const scene: StateNode = {
       actions: [
         {
           text: "Подойти ближе",
-          effects: [
-            {
-              goto: "kitchen_curtains_closed",
-            },
-          ],
+          effects: {
+            goto: "kitchen_curtains_closed",
+          },
         },
       ],
     },

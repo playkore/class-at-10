@@ -171,11 +171,9 @@ export const gameSpec: GameSpec = {
   terminals: {
     true_ending: {
       title: "Конец",
-      effects: [
-        {
-          end: true,
-        },
-      ],
+      effects: {
+        end: true,
+      },
     },
   },
 };

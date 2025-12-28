@@ -17,11 +17,9 @@ const scene: StateNode = {
       actions: [
         {
           text: "Выключить будильник",
-          effects: [
-            {
-              goto: "room_bed_view_muted_alarm",
-            },
-          ],
+          effects: {
+            goto: "room_bed_view_muted_alarm",
+          },
         },
       ],
       image: "",

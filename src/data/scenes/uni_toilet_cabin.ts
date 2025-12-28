@@ -6,11 +6,9 @@ const scene: StateNode = {
   actions: [
     {
       text: "Назад",
-      effects: [
-        {
-          goto: "uni_toilet",
-        },
-      ],
+      effects: {
+        goto: "uni_toilet",
+      },
     },
   ],
   objects: [
@@ -26,17 +24,13 @@ const scene: StateNode = {
       actions: [
         {
           text: "Взять",
-          effects: [
-            {
-              message:
-                "Это же Наташина тетрадь по возрастной! О, у нее есть вчерашняя лекция.",
+          effects: {
+            message:
+              "Это же Наташина тетрадь по возрастной! О, у нее есть вчерашняя лекция.",
+            set: {
+              "daily.found_natasha_notebook": true,
             },
-            {
-              set: {
-                "daily.found_natasha_notebook": true,
-              },
-            },
-          ],
+          },
         },
       ],
       visible: { not: "daily.found_natasha_notebook" },

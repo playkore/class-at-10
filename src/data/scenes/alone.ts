@@ -6,14 +6,10 @@ const scene: StateNode = {
   actions: [
     {
       text: "Закрыть глаза, задремать",
-      effects: [
-        {
-          message: "Скучно и клонит в сон.",
-        },
-        {
-          goto: "sleep_next_day",
-        },
-      ],
+      effects: {
+        message: "Скучно и клонит в сон.",
+        goto: "sleep_next_day",
+      },
     },
   ],
 };

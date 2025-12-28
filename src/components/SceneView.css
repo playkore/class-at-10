@@ -88,6 +88,56 @@
   white-space: pre-line;
 }
 
+.dialogOptionsOverlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px 16px 16px;
+  background: linear-gradient(
+    0deg,
+    rgba(4, 12, 8, 0.95) 0%,
+    rgba(4, 12, 8, 0.7) 70%,
+    transparent 100%
+  );
+  z-index: 2;
+  pointer-events: none;
+}
+
+.dialogOptionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  pointer-events: auto;
+}
+
+.dialogOptionButton {
+  appearance: none;
+  border: 1px solid rgba(0, 255, 122, 0.55);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  color: rgba(215, 255, 231, 0.95);
+  padding: 14px 18px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease;
+  width: 100%;
+}
+
+.dialogOptionButton strong {
+  font-size: 0.95rem;
+}
+
+.dialogOptionButton:focus-visible {
+  border-color: rgba(0, 255, 122, 0.9);
+  outline: none;
+}
+
 .sceneActionsOverlay {
   position: absolute;
   bottom: 0;

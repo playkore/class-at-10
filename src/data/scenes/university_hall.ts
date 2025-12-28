@@ -27,16 +27,12 @@ const scene: StateNode = {
       actions: [
         {
           text: "Познакомиться",
-          effects: [
-            {
-              set: {
-                "daily.talked_konstantin_today": true,
-              },
+          effects: {
+            set: {
+              "daily.talked_konstantin_today": true,
             },
-            {
-              goto: "university_hall_boy_close",
-            },
-          ],
+            goto: "university_hall_boy_close",
+          },
         },
       ],
     },
@@ -52,11 +48,9 @@ const scene: StateNode = {
       actions: [
         {
           text: "Присесть",
-          effects: [
-            {
-              goto: "university_hall_corner",
-            },
-          ],
+          effects: {
+            goto: "university_hall_corner",
+          },
         },
       ],
     },
@@ -75,18 +69,14 @@ const scene: StateNode = {
           guards: [
             {
               if: "daily.used_toilet_home",
-              effects: [
-                {
-                  message: "Не хочется.",
-                },
-              ],
+              effects: {
+                message: "Не хочется.",
+              },
             },
           ],
-          effects: [
-            {
-              goto: "uni_toilet",
-            },
-          ],
+          effects: {
+            goto: "uni_toilet",
+          },
         },
       ],
     },
@@ -102,22 +92,18 @@ const scene: StateNode = {
       actions: [
         {
           text: "Идти на занятия",
-          effects: [
-            {
-              goto: "lecture_hall",
-            },
-          ],
+          effects: {
+            goto: "lecture_hall",
+          },
           guards: [
             {
               if: {
                 not: "persistent.knows_schedule",
               },
-              effects: [
-                {
-                  message:
-                    "Я не знаю, в какой аудитории сегодня занятие. Подожду тут одногруппниц.",
-                },
-              ],
+              effects: {
+                message:
+                  "Я не знаю, в какой аудитории сегодня занятие. Подожду тут одногруппниц.",
+              },
             },
           ],
         },

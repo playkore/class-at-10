@@ -6,19 +6,15 @@ const scene: StateNode = {
   actions: [
     {
       text: "А позвонить?",
-      effects: [
-        {
-          goto: "konstantin_needs_change",
-        },
-      ],
+      effects: {
+        goto: "konstantin_needs_change",
+      },
     },
     {
       text: "Пожелать удачи и уйти",
-      effects: [
-        {
-          goto: "university_hall",
-        },
-      ],
+      effects: {
+        goto: "university_hall",
+      },
     },
   ],
 };

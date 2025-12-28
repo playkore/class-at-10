@@ -1,6 +1,7 @@
 import type {
   ActionDef,
   ActionId,
+  DialogOption,
   Effects,
   GameSpec,
   StateId,
@@ -22,6 +23,8 @@ export type GameState = {
   };
   variables: VariableState;
   message: string | null;
+  dialogLines: string[];
+  dialogOptions: DialogOption[];
   isEnded: boolean;
 };
 
@@ -55,6 +58,8 @@ export const createInitialGameState = (spec: GameSpec): GameState => {
     },
     variables,
     message: null,
+    dialogLines: [],
+    dialogOptions: [],
     isEnded: false,
   });
 
@@ -66,6 +71,8 @@ export const createInitialGameState = (spec: GameSpec): GameState => {
     },
     variables,
     message,
+    dialogLines: [],
+    dialogOptions: [],
     isEnded: false,
   };
 };
@@ -88,6 +95,8 @@ const cloneState = (state: GameState): GameState => ({
   },
   variables: { ...state.variables },
   message: state.message,
+  dialogLines: [...state.dialogLines],
+  dialogOptions: [...state.dialogOptions],
   isEnded: state.isEnded,
 });
 
@@ -148,6 +157,12 @@ const applyEffects = (state: GameState, spec: GameSpec, effects?: Effects) => {
   if (!effects) {
     return;
   }
+  if (effects.dialog_options !== undefined) {
+    state.dialogOptions = effects.dialog_options;
+  }
+  if (effects.add_dialog_lines) {
+    state.dialogLines = state.dialogLines.concat(effects.add_dialog_lines);
+  }
   if (effects.reset === "daily_flags") {
     state.flags.daily = buildFlagState(spec, "daily_flags");
   }
@@ -202,8 +217,17 @@ export const applyAction = (
     return state;
   }
 
+  return applyActionDefinition(state, spec, action);
+};
+
+export const applyActionDefinition = (
+  state: GameState,
+  spec: GameSpec,
+  action: ActionDef
+): GameState => {
   const nextState = cloneState(state);
   nextState.message = null;
+  nextState.dialogOptions = [];
 
   if (action.guard && !evaluateExpression(action.guard, nextState)) {
     applyEffects(nextState, spec, action.failed_effects);
@@ -220,6 +244,22 @@ export const applyAction = (
   }
 
   applyEffects(nextState, spec, action.effects);
+  return finalizeState(nextState, spec);
+};
+
+export const applyDialogOption = (
+  state: GameState,
+  spec: GameSpec,
+  option: DialogOption
+): GameState => {
+  if (state.isEnded) {
+    return state;
+  }
+
+  const nextState = cloneState(state);
+  nextState.message = null;
+  nextState.dialogOptions = [];
+  applyEffects(nextState, spec, option.effects);
   return finalizeState(nextState, spec);
 };
 

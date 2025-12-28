@@ -6,11 +6,9 @@ const scene: StateNode = {
   actions: [
     {
       text: "Выйти",
-      effects: [
-        {
-          goto: "university_hall",
-        },
-      ],
+      effects: {
+        goto: "university_hall",
+      },
     },
   ],
   objects: [
@@ -27,11 +25,9 @@ const scene: StateNode = {
       actions: [
         {
           text: "Зайти внутрь",
-          effects: [
-            {
-              goto: "uni_toilet_cabin",
-            },
-          ],
+          effects: {
+            goto: "uni_toilet_cabin",
+          },
         },
       ],
     },

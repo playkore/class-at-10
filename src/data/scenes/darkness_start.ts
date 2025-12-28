@@ -6,11 +6,9 @@ const scene: StateNode = {
   actions: [
     {
       text: "Открыть глаза",
-      effects: [
-        {
-          goto: "room_bed_view_ringing_alarm",
-        },
-      ],
+      effects: {
+        goto: "room_bed_view_ringing_alarm",
+      },
     },
   ],
   objects: [],

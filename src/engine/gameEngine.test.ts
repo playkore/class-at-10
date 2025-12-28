@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { ActionDef, GameSpec } from "../data/types";
 import {
   applyAction,
+  applyDialogOption,
   buildActionLabel,
   createInitialGameState,
   getNode,
@@ -135,6 +136,40 @@ describe("applyAction", () => {
     expect(nextState.flags.daily.d1).toBe(true);
     expect(nextState.flags.persistent.p1).toBe(false);
     expect(nextState.isEnded).toBe(true);
+  });
+
+  it("appends dialog lines and updates dialog options", () => {
+    const spec = baseSpec([
+      {
+        text: "Chat",
+        effects: {
+          add_dialog_lines: ["Hello"],
+          dialog_options: [
+            {
+              text: "Reply",
+              effects: {
+                add_dialog_lines: ["Hi there"],
+              },
+            },
+          ],
+        },
+      },
+    ]);
+
+    const state = createInitialGameState(spec);
+    const nextState = applyAction(state, spec, 0);
+
+    expect(nextState.dialogLines).toEqual(["Hello"]);
+    expect(nextState.dialogOptions).toHaveLength(1);
+
+    const dialogState = applyDialogOption(
+      nextState,
+      spec,
+      nextState.dialogOptions[0]
+    );
+
+    expect(dialogState.dialogLines).toEqual(["Hello", "Hi there"]);
+    expect(dialogState.dialogOptions).toHaveLength(0);
   });
 });
 

@@ -6,14 +6,10 @@ const scene: StateNode = {
   actions: [
     {
       text: "Женская интуиция. Иди один сдавай.",
-      effects: [
-        {
-          message: "Ладно, может ты и права… Пойду, пожалуй. Пока!",
-        },
-        {
-          goto: "university_hall",
-        },
-      ],
+      effects: {
+        message: "Ладно, может ты и права… Пойду, пожалуй. Пока!",
+        goto: "university_hall",
+      },
     },
   ],
 };

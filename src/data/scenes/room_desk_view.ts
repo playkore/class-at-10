@@ -16,16 +16,12 @@ const scene: StateNode = {
       actions: [
         {
           text: "Посмотреть расписание",
-          effects: [
-            {
-              set: {
-                "persistent.knows_schedule": true,
-              },
+          effects: {
+            set: {
+              "persistent.knows_schedule": true,
             },
-            {
-              message: "Ага, сегодня у меня аудитория 404.",
-            },
-          ],
+            message: "Ага, сегодня у меня аудитория 404.",
+          },
         },
       ],
       image: "",
@@ -43,21 +39,17 @@ const scene: StateNode = {
       actions: [
         {
           text: "Открыть ящик",
-          effects: [
-            {
-              goto: "room_desk_drawer_open",
-            },
-          ],
+          effects: {
+            goto: "room_desk_drawer_open",
+          },
           guards: [
             {
               if: {
                 not: "persistent.pass_unlocked",
               },
-              effects: [
-                {
-                  message: "Мне там ничего не нужно, там только хлам всякий.",
-                },
-              ],
+              effects: {
+                message: "Мне там ничего не нужно, там только хлам всякий.",
+              },
             },
           ],
         },
@@ -77,21 +69,17 @@ const scene: StateNode = {
       actions: [
         {
           text: "Накраситься",
-          effects: [
-            {
-              set: {
-                "daily.makeup_on": true,
-              },
+          effects: {
+            set: {
+              "daily.makeup_on": true,
             },
-          ],
+          },
           guards: [
             {
               if: "daily.makeup_on",
-              effects: [
-                {
-                  message: "Я уже накрасилась.",
-                },
-              ],
+              effects: {
+                message: "Я уже накрасилась.",
+              },
             },
           ],
         },
@@ -111,13 +99,11 @@ const scene: StateNode = {
       actions: [
         {
           text: "Взять",
-          effects: [
-            {
-              set: {
-                "daily.has_notebook": true,
-              },
+          effects: {
+            set: {
+              "daily.has_notebook": true,
             },
-          ],
+          },
         },
       ],
       image: "scenes/apartment-desk/object-notebook.png",
@@ -137,13 +123,11 @@ const scene: StateNode = {
       actions: [
         {
           text: "Одеться",
-          effects: [
-            {
-              set: {
-                "daily.is_dressed": true,
-              },
+          effects: {
+            set: {
+              "daily.is_dressed": true,
             },
-          ],
+          },
         },
       ],
       image: "scenes/apartment-desk/object-clothes.png",
@@ -155,11 +139,9 @@ const scene: StateNode = {
   actions: [
     {
       text: "В коридор",
-      effects: [
-        {
-          goto: "corridor",
-        },
-      ],
+      effects: {
+        goto: "corridor",
+      },
     },
   ],
 };

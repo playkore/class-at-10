@@ -21,22 +21,16 @@ const scene: StateNode = {
   actions: [
     {
       text: "Встать",
-      effects: [
-        {
-          goto: "university_hall",
-        },
-      ],
+      effects: {
+        goto: "university_hall",
+      },
     },
     {
       text: "Подремать",
-      effects: [
-        {
-          message: "Задремать прямо тут — плохая идея... но глаза закрываются.",
-        },
-        {
-          goto: "sleep_next_day",
-        },
-      ],
+      effects: {
+        message: "Задремать прямо тут — плохая идея... но глаза закрываются.",
+        goto: "sleep_next_day",
+      },
     },
   ],
 };

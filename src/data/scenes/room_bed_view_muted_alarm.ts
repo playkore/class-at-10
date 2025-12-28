@@ -6,19 +6,15 @@ const scene: StateNode = {
   actions: [
     {
       text: "Встать",
-      effects: [
-        {
-          goto: "room_desk_view",
-        },
-      ],
+      effects: {
+        goto: "room_desk_view",
+      },
     },
     {
       text: "Закрыть глаза",
-      effects: [
-        {
-          goto: "darkness_start",
-        },
-      ],
+      effects: {
+        goto: "darkness_start",
+      },
     },
   ],
   objects: [],

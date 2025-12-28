@@ -17,11 +17,9 @@ const scene: StateNode = {
       actions: [
         {
           text: "Сесть рядом",
-          effects: [
-            {
-              goto: "with_natasha",
-            },
-          ],
+          effects: {
+            goto: "with_natasha",
+          },
         },
       ],
     },

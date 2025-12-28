@@ -2,138 +2,15 @@ import { useEffect, useMemo, useState } from "react";
 import SceneView, { type SceneInteraction } from "./components/SceneView";
 import DebugPanel from "./components/DebugPanel";
 import { gameSpec } from "./data/gameSpec";
-import type {
-  ActionDef,
-  BoundingBox,
-  Effect,
-  GameSpec,
-  ValuePath,
-  VarPath,
-} from "./data/types";
-import { createInitialGameState, type GameState } from "./engine/gameEngine";
+import type { BoundingBox, DialogOption } from "./data/types";
+import {
+  applyActionDefinition,
+  applyDialogOption,
+  createInitialGameState,
+  type GameState,
+} from "./engine/gameEngine";
 import { evaluateExpression } from "./utils/evaluateExpression";
 import "./App.css";
-
-const buildFlagState = (spec: GameSpec, key: keyof GameSpec["flags"]) => {
-  const entries = Object.entries(spec.flags[key]);
-  return entries.reduce<Record<string, boolean>>((acc, [flagId, flagSpec]) => {
-    acc[flagId] = Boolean(flagSpec.initial);
-    return acc;
-  }, {});
-};
-
-const cloneState = (state: GameState): GameState => ({
-  currentStateId: state.currentStateId,
-  flags: {
-    persistent: { ...state.flags.persistent },
-    daily: { ...state.flags.daily },
-  },
-  variables: { ...state.variables },
-  message: state.message,
-  isEnded: state.isEnded,
-});
-
-const getValue = (state: GameState, path: ValuePath) => {
-  const [namespace, key] = path.split(".");
-  if (namespace === "daily") {
-    return state.flags.daily[key];
-  }
-  if (namespace === "persistent") {
-    return state.flags.persistent[key];
-  }
-  return state.variables[path as VarPath];
-};
-
-const setValue = (state: GameState, path: ValuePath, value: any) => {
-  const [namespace, key] = path.split(".");
-  if (namespace === "daily") {
-    state.flags.daily[key] = Boolean(value);
-    return;
-  }
-  if (namespace === "persistent") {
-    state.flags.persistent[key] = Boolean(value);
-    return;
-  }
-  state.variables[path as VarPath] = value;
-};
-
-const applyEffects = (state: GameState, spec: GameSpec, effects?: Effect[]) => {
-  if (!effects) {
-    return;
-  }
-  for (const effect of effects) {
-    if ("set" in effect) {
-      for (const [path, value] of Object.entries(effect.set)) {
-        setValue(state, path as ValuePath, value);
-      }
-      continue;
-    }
-    if ("inc" in effect) {
-      for (const [path, value] of Object.entries(effect.inc)) {
-        const current = getValue(state, path as ValuePath);
-        const base = typeof current === "number" ? current : 0;
-        state.variables[path as VarPath] = base + value;
-      }
-      continue;
-    }
-    if ("reset" in effect) {
-      if (effect.reset === "daily_flags") {
-        state.flags.daily = buildFlagState(spec, "daily_flags");
-      }
-      if (effect.reset === "persistent_flags") {
-        state.flags.persistent = buildFlagState(spec, "persistent_flags");
-      }
-      continue;
-    }
-    if ("message" in effect) {
-      state.message = effect.message;
-      continue;
-    }
-    if ("goto" in effect) {
-      state.currentStateId = effect.goto;
-      continue;
-    }
-    if ("end" in effect) {
-      state.isEnded = true;
-    }
-  }
-};
-
-const finalizeState = (state: GameState, spec: GameSpec) => {
-  if (spec.meta.loop.end_states.includes(state.currentStateId)) {
-    state.isEnded = true;
-  }
-  return state;
-};
-
-const applyActionDefinition = (
-  state: GameState,
-  spec: GameSpec,
-  action: ActionDef
-) => {
-  if (state.isEnded) {
-    return state;
-  }
-  const nextState = cloneState(state);
-  nextState.message = null;
-
-  if (action.guard && !evaluateExpression(action.guard, nextState)) {
-    applyEffects(nextState, spec, action.failed_effects);
-    return finalizeState(nextState, spec);
-  }
-
-  if (action.guards) {
-    for (const guard of action.guards) {
-      if (evaluateExpression(guard.if, nextState)) {
-        applyEffects(nextState, spec, guard.effects);
-        return finalizeState(nextState, spec);
-      }
-    }
-  }
-
-  applyEffects(nextState, spec, action.effects);
-  return finalizeState(nextState, spec);
-};
 
 const App = () => {
   const [gameState, setGameState] = useState<GameState>(() =>
@@ -216,14 +93,36 @@ const App = () => {
       }));
   }, [activeObject, gameState]);
 
+  const dialogOptions = useMemo(() => {
+    if (gameState.isEnded) {
+      return [];
+    }
+    return gameState.dialogOptions.filter((option) =>
+      evaluateExpression(option.visible, gameState)
+    );
+  }, [gameState]);
+
   const interactions = activeObject ? objectActions : sceneActions;
+  const dialogText =
+    gameState.dialogLines.length > 0
+      ? gameState.dialogLines.join("\n")
+      : null;
   const descriptionText = activeObject
     ? activeObject.description ?? activeObject.name
-    : gameState.message ?? scene?.title ?? "";
+    : dialogText ?? gameState.message ?? scene?.title ?? "";
 
   const handleInteractionSelect = (interaction: SceneInteraction) => {
+    console.log("Selected interaction", interaction);
     setGameState((prevState) =>
       applyActionDefinition(prevState, gameSpec, interaction.action)
+    );
+    setSelectedObjectId(null);
+    setIsMenuOpen(false);
+  };
+
+  const handleDialogOptionSelect = (option: DialogOption) => {
+    setGameState((prevState) =>
+      applyDialogOption(prevState, gameSpec, option)
     );
     setSelectedObjectId(null);
     setIsMenuOpen(false);
@@ -308,6 +207,8 @@ const App = () => {
                 descriptionText={descriptionText}
                 interactions={interactions}
                 onInteractionSelect={handleInteractionSelect}
+                dialogOptions={dialogOptions}
+                onDialogOptionSelect={handleDialogOptionSelect}
                 menuAction={
                   <button
                     type="button"

@@ -8,6 +8,7 @@ import {
 import type {
   ActionDef,
   BoundingBox,
+  DialogOption,
   SceneObject,
   StateNode,
 } from "../data/types";
@@ -34,6 +35,8 @@ export interface SceneViewProps {
   descriptionText: string | null;
   interactions: SceneInteraction[];
   onInteractionSelect: (interaction: SceneInteraction) => void;
+  dialogOptions?: DialogOption[];
+  onDialogOptionSelect?: (option: DialogOption) => void;
   menuAction?: ReactNode;
   editBoundingBoxes?: boolean;
   onBoundingBoxChange?: (objectId: string, box: BoundingBox) => void;
@@ -118,6 +121,8 @@ const SceneView = ({
   descriptionText,
   interactions,
   onInteractionSelect,
+  dialogOptions = [],
+  onDialogOptionSelect,
   menuAction,
   editBoundingBoxes = false,
   onBoundingBoxChange,
@@ -128,6 +133,7 @@ const SceneView = ({
   const progressPercent =
     totalCount > 0 ? Math.round((loadedCount / totalCount) * 100) : 100;
   const imageSrc = scene.image ? resolveSceneImage(scene.image) : null;
+  const showDialogOptions = dialogOptions.length > 0;
   const objectsWithVisibility = (scene.objects ?? []).map(
     (sceneObject, index) => ({
       sceneObject: {
@@ -253,24 +259,41 @@ const SceneView = ({
           <div className="sceneBackdrop" aria-hidden="true" />
         )}
         <SceneDescriptionOverlay text={descriptionText} />
-        {(interactions.length > 0 || menuAction) && (
-          <div className="sceneActionsOverlay">
-            <div className="sceneActionsList" role="group">
-              {interactions.map((interaction) => (
+        {showDialogOptions ? (
+          <div className="dialogOptionsOverlay">
+            <div className="dialogOptionsList" role="group">
+              {dialogOptions.map((option, index) => (
                 <button
-                  key={interaction.id}
+                  key={`dialog-option-${index}`}
                   type="button"
-                  className="sceneActionButton"
-                  onClick={() => onInteractionSelect(interaction)}
+                  className="dialogOptionButton"
+                  onClick={() => onDialogOptionSelect?.(option)}
                 >
-                  <strong>{interaction.label}</strong>
+                  <strong>{option.text}</strong>
                 </button>
               ))}
-              {menuAction && (
-                <div className="sceneActionMenu">{menuAction}</div>
-              )}
             </div>
           </div>
+        ) : (
+          (interactions.length > 0 || menuAction) && (
+            <div className="sceneActionsOverlay">
+              <div className="sceneActionsList" role="group">
+                {interactions.map((interaction) => (
+                  <button
+                    key={interaction.id}
+                    type="button"
+                    className="sceneActionButton"
+                    onClick={() => onInteractionSelect(interaction)}
+                  >
+                    <strong>{interaction.label}</strong>
+                  </button>
+                ))}
+                {menuAction && (
+                  <div className="sceneActionMenu">{menuAction}</div>
+                )}
+              </div>
+            </div>
+          )
         )}
         {objectsWithVisibility.map(({ sceneObject, isVisible }) => {
           if (!sceneObject.image || !isVisible) {

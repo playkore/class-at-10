@@ -6,11 +6,9 @@ const scene: StateNode = {
   actions: [
     {
       text: "Выйти на остановке",
-      effects: [
-        {
-          goto: "university_outside",
-        },
-      ],
+      effects: {
+        goto: "university_outside",
+      },
       visible: "daily.paid_for_tram",
     },
   ],
@@ -32,37 +30,27 @@ const scene: StateNode = {
               if: {
                 not: "daily.has_pass",
               },
-              effects: [
-                {
-                  set: {
-                    "persistent.pass_unlocked": true,
-                  },
+              effects: {
+                set: {
+                  "persistent.pass_unlocked": true,
                 },
-                {
-                  message:
-                    "Блин, проездной дома забыла. Точно помню, он в столе дома лежит. Придется теперь билет покупать.",
-                },
-              ],
+                message:
+                  "Блин, проездной дома забыла. Точно помню, он в столе дома лежит. Придется теперь билет покупать.",
+              },
             },
             {
               if: "daily.paid_for_tram",
-              effects: [
-                {
-                  message: "Да я уже показывала...",
-                },
-              ],
-            },
-          ],
-          effects: [
-            {
-              message: "Кондуктор кивает.",
-            },
-            {
-              set: {
-                "daily.paid_for_tram": true,
+              effects: {
+                message: "Да я уже показывала...",
               },
             },
           ],
+          effects: {
+            message: "Кондуктор кивает.",
+            set: {
+              "daily.paid_for_tram": true,
+            },
+          },
           visible: { not: "daily.paid_for_tram" },
         },
         {
@@ -70,28 +58,18 @@ const scene: StateNode = {
           guards: [
             {
               if: "daily.has_pass",
-              effects: [
-                {
-                  message: "Да у меня же проездной!",
-                },
-              ],
-            },
-          ],
-          effects: [
-            {
-              message: "Кондуктор принимает монетки и даёт билет.",
-            },
-            {
-              set: {
-                "daily.paid_for_tram": true,
-              },
-            },
-            {
-              set: {
-                "daily.has_coins": false,
+              effects: {
+                message: "Да у меня же проездной!",
               },
             },
           ],
+          effects: {
+            message: "Кондуктор принимает монетки и даёт билет.",
+            set: {
+              "daily.paid_for_tram": true,
+              "daily.has_coins": false,
+            },
+          },
           visible: { and: ["daily.has_coins", { not: "daily.paid_for_tram" }] },
         },
       ],

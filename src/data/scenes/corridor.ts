@@ -17,11 +17,9 @@ const scene: StateNode = {
       actions: [
         {
           text: "Открыть дверь",
-          effects: [
-            {
-              goto: "bathroom",
-            },
-          ],
+          effects: {
+            goto: "bathroom",
+          },
         },
       ],
       image: "",

@@ -6,19 +6,15 @@ const scene: StateNode = {
   actions: [
     {
       text: "Раздвинуть шторы",
-      effects: [
-        {
-          goto: "kitchen_curtains_open",
-        },
-      ],
+      effects: {
+        goto: "kitchen_curtains_open",
+      },
     },
     {
       text: "Назад",
-      effects: [
-        {
-          goto: "kitchen",
-        },
-      ],
+      effects: {
+        goto: "kitchen",
+      },
     },
   ],
 };

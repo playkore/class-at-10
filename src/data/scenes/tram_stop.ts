@@ -16,11 +16,9 @@ const scene: StateNode = {
       actions: [
         {
           text: "Зайти в трамвай",
-          effects: [
-            {
-              goto: "tram_inside",
-            },
-          ],
+          effects: {
+            goto: "tram_inside",
+          },
         },
       ],
       image: "",

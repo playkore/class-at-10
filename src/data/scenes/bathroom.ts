@@ -6,29 +6,19 @@ const scene: StateNode = {
   actions: [
     {
       text: "Выйти",
-      effects: [
-        {
-          goto: "corridor",
-        },
-      ],
+      effects: {
+        goto: "corridor",
+      },
     },
     {
       text: "Умыться и почистить зубы",
-      effects: [
-        {
-          set: {
-            "daily.washed_face": true,
-          },
+      effects: {
+        set: {
+          "daily.washed_face": true,
+          "daily.makeup_on": false,
         },
-        {
-          set: {
-            "daily.makeup_on": false,
-          },
-        },
-        {
-          goto: "bathroom",
-        },
-      ],
+        goto: "bathroom",
+      },
     },
   ],
 };
