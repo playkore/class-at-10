@@ -39,13 +39,16 @@ const scene: StateNode = {
                   },
                 },
                 {
-                  set: {
-                    "daily.paid_for_tram": true,
-                  },
-                },
-                {
                   message:
-                    "Блин, проездной дома забыла. Точно помню, он в шкафу дома лежит. Придется теперь билет покупать.",
+                    "Блин, проездной дома забыла. Точно помню, он в столе дома лежит. Придется теперь билет покупать.",
+                },
+              ],
+            },
+            {
+              if: "daily.paid_for_tram",
+              effects: [
+                {
+                  message: "Да я уже показывала...",
                 },
               ],
             },
@@ -54,20 +57,42 @@ const scene: StateNode = {
             {
               message: "Кондуктор кивает.",
             },
+            {
+              set: {
+                "daily.paid_for_tram": true,
+              },
+            },
           ],
+          visible: { not: "daily.paid_for_tram" },
         },
         {
           text: "Купить билет",
+          guards: [
+            {
+              if: "daily.has_pass",
+              effects: [
+                {
+                  message: "Да у меня же проездной!",
+                },
+              ],
+            },
+          ],
           effects: [
             {
               message: "Кондуктор принимает монетки и даёт билет.",
             },
             {
               set: {
-                "persistent.pass_unlocked": true,
+                "daily.paid_for_tram": true,
+              },
+            },
+            {
+              set: {
+                "daily.has_coins": false,
               },
             },
           ],
+          visible: { and: ["daily.has_coins", { not: "daily.paid_for_tram" }] },
         },
       ],
       image: "",
