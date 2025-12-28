@@ -63,15 +63,6 @@ export type BooleanExpression =
   | boolean
   | ValuePath;
 
-// Dialogs
-export type SpeakerId = "protagonist" | "natasha" | "konstantin";
-
-// A single line of dialog spoken by a character
-export interface DialogLine {
-  speaker: SpeakerId;
-  text: string;
-}
-
 // A dialog option on the screen to select, similar to a button
 export type DialogOption = {
   text: string;
@@ -159,5 +150,5 @@ export type Effect =
   | { end: true }
   | { message: string }
   | { goto: StateId }
-  | { dialog_lines: DialogLine[] }
+  | { add_dialog_line: string }
   | { dialog_options: DialogOption[] };

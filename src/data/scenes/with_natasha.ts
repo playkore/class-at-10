@@ -10,16 +10,11 @@ const scene: StateNode = {
         {
           dialog_options: [
             {
-              text: "Наташа, у тебя случайно нет вчераней лекции по возрастной?",
+              text: "Наташа, у тебя случайно нет вчерашней лекции по возрастной?",
               visible: { not: "daily.returned_natasha_notebook_today" },
               effects: [
                 {
-                  dialog_lines: [
-                    {
-                      speaker: "natasha",
-                      text: "Кажется, я забыла тетрадь дома...",
-                    },
-                  ],
+                  add_dialog_line: "Кажется, я забыла тетрадь дома...",
                 },
               ],
             },
@@ -33,12 +28,7 @@ const scene: StateNode = {
               },
               effects: [
                 {
-                  dialog_lines: [
-                    {
-                      speaker: "natasha",
-                      text: "Ой! Спасибо большое!",
-                    },
-                  ],
+                  add_dialog_line: "Ой! Спасибо большое!",
                   set: {
                     "daily.returned_natasha_notebook_today": true,
                   },
@@ -47,14 +37,11 @@ const scene: StateNode = {
                       text: "Можно, кстати, списать у тебя вчерашнюю лекцию?",
                       effects: [
                         {
-                          dialog_lines: [
+                          add_dialog_line: "Конечно, держи.",
+                          dialog_options: [
                             {
-                              speaker: "natasha",
-                              text: "Конечно, держи.",
-                            },
-                            {
-                              speaker: "protagonist",
                               text: "Спасибо! Я тогда пойду в буфет на полпары, чтобы списать.",
+                              effects: [{ goto: "cafeteria" }],
                             },
                           ],
                         },
