@@ -1,7 +1,7 @@
 import { StateNode } from "../types";
 
 const scene: StateNode = {
-  title: "Будильник звонит",
+  title: "Будильник пиликает на всю квартиру.",
   image: "scenes/alarm-ringing/background.png",
   objects: [
     {

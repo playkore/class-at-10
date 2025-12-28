@@ -1,7 +1,7 @@
 import { StateNode } from "../types";
 
 const scene: StateNode = {
-  title: "Темнота",
+  title: "Какой-то звук...",
   image: "scenes/darkness/background.png",
   actions: [
     {

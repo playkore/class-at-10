@@ -6,14 +6,14 @@ const scene: StateNode = {
   on_enter: {
     messages: [
       {
-        message: "…",
+        message: "...",
         visible: true,
       },
     ],
   },
   actions: [
     {
-      text: "Открыть глаза",
+      text: "Какой странный сон...",
       effects: [
         {
           inc: {
