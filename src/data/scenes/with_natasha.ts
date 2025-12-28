@@ -5,7 +5,7 @@ const scene: StateNode = {
   image: "scenes/class-friend-close/background.png",
   actions: [
     {
-      text: "Отдать тетрадь (если есть)",
+      text: "Отдать тетрадь",
       guards: [
         {
           if: {
@@ -41,23 +41,24 @@ const scene: StateNode = {
           message: "Ой! Моя! Спасибо тебе!",
         },
       ],
+      visible: {
+        and: [
+          "daily.found_natasha_notebook",
+          { not: "daily.returned_natasha_notebook_today" },
+        ],
+      },
     },
     {
       text: "Попросить списать вчерашнюю лекцию",
-      guard: "persistent.natasha_owes",
-      failed_effects: [
-        {
-          message: "Неудобно просить — я ей ещё ничем не помогла.",
-        },
-      ],
+      visible: {
+        and: ["daily.returned_natasha_notebook_today"],
+      },
       guards: [
         {
-          if: {
-            not: "daily.returned_natasha_notebook_today",
-          },
+          if: { not: "daily.got_lecture_notebook_today" },
           effects: [
             {
-              message: "Эх… я сегодня свою тетрадь забыла.",
+              message: "Странно, мне кажется я забыла тетрадь дома...",
             },
           ],
         },
@@ -69,41 +70,18 @@ const scene: StateNode = {
           },
         },
         {
-          message: "Держи, вот моя другая тетрадь, там лекция.",
+          message: "Наташа отдает тетрадь. Ура. Надо сесть в буфете и списать.",
         },
       ],
     },
     {
       text: "Пойти в буфет на полпары",
-      guards: [
-        {
-          if: {
-            not: "daily.got_lecture_notebook_today",
-          },
-          effects: [
-            {
-              message:
-                "Сначала бы списать лекцию — без тетради там делать нечего.",
-            },
-          ],
-        },
-        {
-          if: "daily.went_to_cafeteria_today",
-          effects: [
-            {
-              message: "Я уже прогуливала сегодня — второй раз нельзя.",
-            },
-          ],
-        },
-      ],
+      visible: "daily.got_lecture_notebook_today",
       effects: [
         {
           set: {
             "daily.went_to_cafeteria_today": true,
           },
-        },
-        {
-          message: "С Наташиным конспектом можно прогулять полпары.",
         },
         {
           goto: "cafeteria",
