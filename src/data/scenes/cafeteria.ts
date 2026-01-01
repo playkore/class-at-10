@@ -13,32 +13,61 @@ const scene: StateNode = {
         width: 0.62,
         height: 0.7,
       },
+      visible: {
+        or: [
+          { not: "persistent.met_konstantin_in_cafeteria" },
+          "persistent.told_friends_wont_come",
+        ],
+      },
       actions: [
         {
           text: "Поговорить",
           effects: {
             dialog_options: [
               {
-                text: "Привет, Константин! Как экзамен?",
                 visible: {
                   not: "persistent.told_friends_wont_come",
                 },
+                text: "Привет, Константин! Как друзья, ты до них дозвонился?",
                 effects: {
                   add_dialog_lines: [
-                    "Привет... Да никак. Они не пришли на экзамен.",
-                    "Я дозвонился до них после экзамена — они бухали вчера в общаге и проспали.",
+                    "Привет. Да, они бухали вчера в общаге и проспали. Я вот зашел в буфет разметять пятерку. Вот твой рубль... Ну ладно, я побежал, может быть еще успаю сдать работу.",
                   ],
-                  set: {
-                    "persistent.told_friends_wont_come": true,
-                  },
+                  dialog_options: [
+                    {
+                      text: "До встречи...",
+                      effects: {
+                        set: { "persistent.met_konstantin_in_cafeteria": true },
+                      },
+                    },
+                  ],
                 },
               },
               {
-                text: "Ты не хочешь вернуть мне рубль, который я тебе одолжил?",
-                visible: "persistent.lent_ruble",
+                text: "Привет, Константин! Как курсовая, приняли?",
+                visible: "persistent.told_friends_wont_come",
                 effects: {
                   add_dialog_lines: [
-                    "Эх, извини, сейчас совсем туго с деньгами...",
+                    "Да! Препод уже убегала на лекцию, я еле успел. Она даже на работа смотреть не стала, подписала зачетку и все. Повезло.",
+                  ],
+                  dialog_options: [
+                    {
+                      text: "Рада за тебя. Поздравляю!",
+                      effects: {
+                        add_dialog_lines: [
+                          "Рада за тебя. Поздравляю!",
+                          "Спасибо! Буду отмечать. У меня пятерка есть, хочешь сочник с творогом?",
+                        ],
+                        dialog_options: [
+                          {
+                            text: "И они жили долго и счастливо.",
+                            effects: {
+                              goto: "cafeteria_true_ending_dialog",
+                            },
+                          },
+                        ],
+                      },
+                    },
                   ],
                 },
               },

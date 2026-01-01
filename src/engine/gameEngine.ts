@@ -42,9 +42,9 @@ const buildFlagState = (spec: GameSpec, key: keyof GameSpec["flags"]) => {
 };
 
 export const createInitialGameState = (spec: GameSpec): GameState => {
-  const variables = Object.entries(spec.meta.loop.variables ?? {}).reduce<
-    VariableState
-  >((acc, [path, variableSpec]) => {
+  const variables = Object.entries(
+    spec.meta.loop.variables ?? {}
+  ).reduce<VariableState>((acc, [path, variableSpec]) => {
     acc[path as VarPath] = variableSpec.initial;
     return acc;
   }, {});
@@ -161,6 +161,8 @@ const applyEffects = (state: GameState, spec: GameSpec, effects?: Effects) => {
   }
   if (effects.dialog_options !== undefined) {
     state.dialogOptions = effects.dialog_options;
+  } else {
+    state.dialogLines = [];
   }
   if (effects.add_dialog_lines) {
     state.dialogLines = state.dialogLines.concat(effects.add_dialog_lines);
