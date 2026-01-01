@@ -137,6 +137,8 @@ const applyGoto = (state: GameState, spec: GameSpec, target?: StateId) => {
     return;
   }
   state.currentStateId = target;
+  state.dialogLines = [];
+  state.dialogOptions = [];
   const lookup = getNode(spec, target);
   if (lookup.kind === "terminal") {
     applyEffects(state, spec, lookup.node.effects);

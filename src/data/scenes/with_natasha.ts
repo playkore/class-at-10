@@ -10,7 +10,7 @@ const scene: StateNode = {
         dialog_options: [
           {
             text: "Наташа, у тебя случайно нет вчерашней лекции по возрастной?",
-            visible: { not: "daily.returned_natasha_notebook_today" },
+            visible: { not: "daily.found_natasha_notebook" },
             effects: {
               add_dialog_lines: ["Кажется, я забыла тетрадь дома..."],
             },
