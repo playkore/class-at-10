@@ -3,14 +3,6 @@ import { StateNode } from "../types";
 const scene: StateNode = {
   title: "Вестибюль университета",
   image: "scenes/university-hall/background.png",
-  on_enter: {
-    messages: [
-      {
-        message: "Константина уже нет — он ушёл сдавать.",
-        visible: "daily.talked_konstantin_today",
-      },
-    ],
-  },
   actions: [],
   objects: [
     {
@@ -24,9 +16,12 @@ const scene: StateNode = {
         height: 0.37,
       },
       image: "scenes/university-hall/object-boy.png",
+      visible: {
+        not: "daily.talked_konstantin_today",
+      },
       actions: [
         {
-          text: "Познакомиться",
+          text: "Подойти ближе",
           effects: {
             set: {
               "daily.talked_konstantin_today": true,
