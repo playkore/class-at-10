@@ -8,6 +8,10 @@ const scene: StateNode = {
       text: "Женская интуиция. Иди один сдавай.",
       effects: {
         message: "Ладно, может ты и права… Пойду, пожалуй. Пока!",
+        set: {
+          "persistent.told_friends_wont_come": true,
+          "daily.talked_konstantin_today": true,
+        },
         goto: "university_hall",
       },
     },

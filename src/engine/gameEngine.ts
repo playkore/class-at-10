@@ -161,8 +161,6 @@ const applyEffects = (state: GameState, spec: GameSpec, effects?: Effects) => {
   }
   if (effects.dialog_options !== undefined) {
     state.dialogOptions = effects.dialog_options;
-  } else {
-    state.dialogLines = [];
   }
   if (effects.add_dialog_lines) {
     state.dialogLines = state.dialogLines.concat(effects.add_dialog_lines);
@@ -231,6 +229,7 @@ export const applyActionDefinition = (
 ): GameState => {
   const nextState = cloneState(state);
   nextState.message = null;
+  nextState.dialogLines = [];
   nextState.dialogOptions = [];
 
   if (action.guard && !evaluateExpression(action.guard, nextState)) {

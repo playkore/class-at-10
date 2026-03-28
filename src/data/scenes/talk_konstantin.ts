@@ -2,7 +2,16 @@ import { StateNode } from "../types";
 
 const scene: StateNode = {
   title: "Диалог: Константин в вестибюле",
-  image: "scenes/university-hall/background.png",
+  image: "scenes/university-hall-boy-close/background.png",
+  on_enter: {
+    messages: [
+      {
+        message:
+          "Может быть, они еще дома, может позвонить им? Вот автомат рядом.",
+        visible: true,
+      },
+    ],
+  },
   actions: [
     {
       text: "А позвонить?",

@@ -15,11 +15,17 @@ const scene: StateNode = {
       },
       visible: {
         and: [
-          { not: "persistent.met_konstantin_in_cafeteria" },
+          "persistent.lent_ruble",
           {
             or: [
-              "persistent.told_friends_wont_come",
               "daily.talked_konstantin_today",
+              "persistent.told_friends_wont_come",
+            ],
+          },
+          {
+            or: [
+              { not: "persistent.met_konstantin_in_cafeteria" },
+              "persistent.told_friends_wont_come",
             ],
           },
         ],
@@ -36,13 +42,16 @@ const scene: StateNode = {
                 text: "Привет, Константин! Как друзья, ты до них дозвонился?",
                 effects: {
                   add_dialog_lines: [
-                    "Привет. Да, они бухали вчера в общаге и проспали. Я вот зашел в буфет разметять пятерку. Вот твой рубль... Ну ладно, я побежал, может быть еще успаю сдать работу.",
+                    "Привет. Да, они бухали вчера в общаге и проспали. Я вот зашел в буфет перед тем, как бежать сдавать работу. Ну ладно, я побежал, может быть еще успею.",
                   ],
                   dialog_options: [
                     {
                       text: "До встречи...",
                       effects: {
-                        set: { "persistent.met_konstantin_in_cafeteria": true },
+                        set: {
+                          "persistent.met_konstantin_in_cafeteria": true,
+                        },
+                        goto: "sleep_next_day",
                       },
                     },
                   ],
