@@ -35,3 +35,19 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.02, -0.7)
 offset_left = 12.0
 offset_top = 8.0
 text = "WASD / arrows: walk   Shift: run   Space: jump   Mouse: camera   Wheel: zoom   Esc: free mouse"
+
+[node name="Prompt" type="Label" parent="."]
+visible = false
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -200.0
+offset_top = -64.0
+offset_right = 200.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "E: look at the desk"
+horizontal_alignment = 1
