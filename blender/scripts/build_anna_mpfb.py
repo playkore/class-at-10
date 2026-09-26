@@ -111,9 +111,13 @@ SMOOTH = {"Anna_Body": [(6, 0.12), (8, 0.1)]}
 # Decimate ratios for dense clothes; applied on export, before skinning.
 DECIMATE = {"Anna_Pants": 0.35, "Anna_Socks": 0.3}
 
-# Garments whose asset has no delete group, so the body under them isn't masked:
-# fit_delete_groups starts their group from every body vertex in their height range.
-SEED_DELETE = {"cortu_cargo_pants"}
+# Garments whose asset has no delete group (or one too small, so skin pokes
+# through): fit_delete_groups starts their group from every body vertex in their
+# height range, then keeps the ones within `reach` metres of the garment and
+# shows `rings` rings of edge vertices again (see fit_delete_groups). The black
+# tank's hem and neckline cut diagonally across the coarse proxy's faces, so one
+# ring leaves holes there.
+SEED_DELETE = {"cortu_cargo_pants": (0.15, 1), "elvs_lara_tank1": (0.15, 2)}
 
 # Meshes whose texture alpha cuts out strands.
 ALPHA_CLIP = {"Anna_Hair", "Anna_Eyebrows", "Anna_Eyelashes"}
@@ -200,12 +204,11 @@ def trim(obj, keep):
 
 def trim_hidden_layers():
     """Cut away the parts of inner layers that poke through outer ones."""
-    for socks, pants, top in (("Anna_Socks", "Anna_Pants", None), ("Anna_BlackSocks", "Anna_Jeans", "Anna_BlackTop")):
+    # The jeans are low-rise and fitted, so they're kept whole: trimming their
+    # waist at the top's hem would cut the back of the waistband off.
+    for socks, pants in (("Anna_Socks", "Anna_Pants"), ("Anna_BlackSocks", "Anna_Jeans")):
         pants_cuff = min(world_z(bpy.data.objects[pants]))
         trim(bpy.data.objects[socks], lambda z: z < pants_cuff + 0.06)
-        if top:
-            top_hem = min(world_z(bpy.data.objects[top]))
-            trim(bpy.data.objects[pants], lambda z: z < top_hem + 0.03)
     if CARDIGAN:
         cardigan_hem = min(world_z(bpy.data.objects["Anna_Cardigan"]))
         # The cardigan is buttoned, so only the tank's neckline shows.
@@ -220,14 +223,14 @@ def fit_delete_groups(body, reach=0.15):
     """Only hide the skin a garment really covers.
 
     Each garment's `Delete.<asset>` group masks the body under it (SEED_DELETE
-    garments get one here). The Mask
-    modifier drops every face touching a masked vertex, and the proxy body is
-    coarse, so the skin can stop centimetres short of the garment's edge: with
+    garments get one here). The Mask modifier drops every face touching a masked
+    vertex, and the proxy body is coarse, so the skin can stop centimetres short of the garment's edge: with
     the tank top that leaves a see-through gap above the back neckline.
 
     So a body vertex stays in the group only if a ray along its normal hits the
     garment within `reach` metres, and then the group is shrunk by one ring of
     edge neighbours, so the faces across the garment's edge are kept.
+    SEED_DELETE garments set their own reach and number of rings.
     """
     depsgraph = bpy.context.evaluated_depsgraph_get()
     for asset in SEED_DELETE:
@@ -238,7 +241,9 @@ def fit_delete_groups(body, reach=0.15):
     for mod in body.modifiers:
         if mod.type != "MASK" or not mod.vertex_group.startswith("Delete."):
             continue
-        garment = bpy.data.objects.get(NAMES.get(mod.vertex_group[len("Delete.") :], ""))
+        asset = mod.vertex_group[len("Delete.") :]
+        garment = bpy.data.objects.get(NAMES.get(asset, ""))
+        asset_reach, rings = SEED_DELETE.get(asset, (reach, 1))
         group = body.vertex_groups.get(mod.vertex_group)
         if garment is None or group is None:
             continue
@@ -255,7 +260,7 @@ def fit_delete_groups(body, reach=0.15):
                 continue
             co = body.matrix_world @ v.co
             n = (normal_mat @ v.normal).normalized()
-            if bvh.ray_cast(co - n * 0.005, n, reach)[0] is None:
+            if bvh.ray_cast(co - n * 0.005, n, asset_reach)[0] is None:
                 uncovered.append(v.index)
         group.remove(uncovered)
         masked = {
@@ -263,10 +268,14 @@ def fit_delete_groups(body, reach=0.15):
             if any(g.group == group.index and g.weight > 0.5 for g in v.groups)
         }
         edge = set()
-        for e in body.data.edges:
-            a, b = e.vertices
-            if (a in masked) != (b in masked):
-                edge.add(a if a in masked else b)
+        for _ in range(rings):
+            ring = set()
+            for e in body.data.edges:
+                a, b = e.vertices
+                if (a in masked) != (b in masked):
+                    ring.add(a if a in masked else b)
+            masked -= ring
+            edge |= ring
         group.remove(list(edge))
         print(f"{group.name}: {len(uncovered)} uncovered and {len(edge)} edge body vertices shown again")
 
