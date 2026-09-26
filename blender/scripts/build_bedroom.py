@@ -120,6 +120,9 @@ def make_materials():
     add("BottleDark", "#2c2c34", 0.3)
     add("Rug", "#8a4a3a", 1.0)
     add("RugBorder", "#c9a070", 1.0)
+    # Wardrobe
+    add("WardrobeWood", "#8a5a34", 0.55)
+    add("Mirror", "#c8d4dc", 0.05, metallic=1.0)
     # Outside
     add("Building", "#8a86a0", 0.9)
     add("WindowLit", "#ffcf7a", 0.5, emission="#ffcf7a", strength=4.0)
@@ -712,6 +715,72 @@ def build_lamp(m, parent):
 
 
 # --------------------------------------------------------------------------
+# Wardrobe on the west wall, facing the bed, between the door and the window
+# --------------------------------------------------------------------------
+
+CLOSET_X0, CLOSET_X1 = 0.0, 0.58   # back against the west wall
+CLOSET_Y0, CLOSET_Y1 = 2.2, 3.3    # clear of the door casing and the curtain
+CLOSET_H = 2.15
+
+
+def build_closet(m):
+    grp = empty("Closet")
+    w = m["WardrobeWood"]
+    x0, x1, y0, y1, h = CLOSET_X0, CLOSET_X1, CLOSET_Y0, CLOSET_Y1, CLOSET_H
+    t = 0.02
+    front = x1 - t  # doors sit in front of the carcass
+    plinth, shelf_z = 0.08, 1.72  # mezzanine compartment above shelf_z
+
+    mb = MeshBuilder()
+    mb.box_minmax((x0, y0, 0), (front, y0 + t, h), w)                  # sides
+    mb.box_minmax((x0, y1 - t, 0), (front, y1, h), w)
+    mb.box_minmax((x0, y0, 0), (x0 + t, y1, h), w)                     # back
+    mb.box_minmax((x0, y0 - 0.015, h), (x1 + 0.015, y1 + 0.015, h + 0.03), w)  # top with overhang
+    mb.box_minmax((x0 + 0.03, y0 + 0.03, 0), (front - 0.04, y1 - 0.03, plinth), w)  # recessed plinth
+    mb.box_minmax((x0, y0, plinth), (front, y1, plinth + t), w)        # bottom
+    mb.box_minmax((x0, y0, shelf_z), (front, y1, shelf_z + t), w)      # mezzanine floor
+    mb.box_minmax((x0, (y0 + y1) / 2 - t / 2, plinth), (front, (y0 + y1) / 2 + t / 2, h), w)  # divider
+    mb.cyl((0.3, (3 * y0 + y1) / 4, shelf_z - 0.07), 0.01, 0.01, (y1 - y0) / 2 - 0.04,
+           m["Metal"], segments=10, rot=(math.pi / 2, 0, 0))            # hanging rail
+    mb.build("ClosetBody", grp, bevel=0.003)
+
+    # Doors, origin at the hinge so Godot can swing them about Z.
+    gap = 0.004
+    ym = (y0 + y1) / 2
+    for name, hinge_y, width, z0, z1, sign in (
+        ("Closet_DoorLeft", y0, ym - y0, plinth, shelf_z + t, 1),
+        ("Closet_DoorRight", y1, y1 - ym, plinth, shelf_z + t, -1),
+        ("Closet_TopDoorLeft", y0, ym - y0, shelf_z + t, h, 1),
+        ("Closet_TopDoorRight", y1, y1 - ym, shelf_z + t, h, -1),
+    ):
+        dw, dh = width - gap, z1 - z0 - gap
+        cy = sign * dw / 2
+        mb = MeshBuilder()
+        mb.box((t / 2, cy, dh / 2), (t, dw, dh), w)
+        # Raised panel frame
+        for dz in (0.05, dh - 0.05):
+            mb.box((t + 0.004, cy, dz), (0.008, dw - 0.06, 0.02), w)
+        for dy in (0.04, dw - 0.04):
+            mb.box((t + 0.004, sign * dy, dh / 2), (0.008, 0.02, dh - 0.08), w)
+        handle_y = sign * (dw - 0.05)
+        if name.startswith("Closet_Top"):
+            mb.cyl((t + 0.015, handle_y, dh / 2), 0.012, 0.012, 0.025, m["Metal"], segments=12,
+                   rot=(0, math.pi / 2, 0))
+        else:
+            mb.box((t + 0.02, handle_y, dh * 0.55), (0.015, 0.015, 0.16), m["Metal"])
+            if sign < 0:  # full-length mirror on the right-hand door
+                mb.box((t + 0.002, cy, dh / 2), (0.004, dw - 0.14, dh - 0.3), m["Mirror"])
+        mb.build(name, grp, location=(front, hinge_y + sign * gap / 2, z0 + gap / 2), bevel=0.002)
+
+    # Suitcase on top
+    mb = MeshBuilder()
+    mb.box((0, 0, 0.1), (0.45, 0.62, 0.2), m["Baseboard"])
+    mb.box((0.23, 0, 0.12), (0.02, 0.14, 0.03), m["ClockPlastic"])
+    mb.build("Closet_Suitcase", grp, location=(0.28, 2.6, h + 0.03), rotation=(0, 0, 0.05), bevel=0.015)
+    return grp
+
+
+# --------------------------------------------------------------------------
 # Lights, world, cameras
 # --------------------------------------------------------------------------
 
@@ -805,6 +874,7 @@ def main():
     build_bed(m)
     build_alarm_clock(m)
     build_desk(m)
+    build_closet(m)
     build_lighting()
     build_cameras()
     bpy.context.scene.frame_set(0)
