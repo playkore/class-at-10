@@ -16,8 +16,10 @@ Root motion is removed: the hips' horizontal drift from the first to the last
 frame is subtracted, so walk and run play in place and Godot moves the body.
 
 Anna_Body has the skin under her clothes masked out, so it can't poke through.
-That skin is exported as a separate mesh, Anna_BodyCovered, which Godot shows
-when she takes her clothes off.
+She has several outfits (see OUTFITS in build_anna_mpfb.py), so that skin is
+exported in pieces by which outfits cover it: Anna_BodyCovered is under all of
+them, Anna_BodyCovered_<outfit> only under one. Godot shows a piece when she
+isn't wearing an outfit that covers it.
 """
 
 from pathlib import Path
@@ -144,30 +146,47 @@ def retarget(name, fbx, tgt, order):
 
 
 def add_covered_skin(body):
-    """Copy of body with only the faces its `Delete.*` masks hide."""
-    masks = [m for m in body.modifiers if m.type == "MASK" and m.vertex_group.startswith("Delete.")]
-    groups = {body.vertex_groups[m.vertex_group].index: m.threshold for m in masks}
-    covered = body.copy()
-    covered.data = body.data.copy()
-    covered.name = covered.data.name = "Anna_BodyCovered"
-    body.users_collection[0].objects.link(covered)
-    for mod in [m for m in covered.modifiers if m.type == "MASK"]:
-        covered.modifiers.remove(mod)
+    """Split the skin that body's `Delete.*` masks hide into one mesh per set of outfits hiding it.
 
-    # A Mask modifier drops every face touching a masked vertex; keep just those.
-    masked = {
-        v.index for v in covered.data.vertices
-        if any(g.group in groups and g.weight > groups[g.group] for g in v.groups)
+    Anna_BodyCovered is under every outfit; Anna_BodyCovered_<outfit> only under that one.
+    """
+    outfit_of = {o["mpfb_asset"]: o["outfit"] for o in bpy.data.objects if "outfit" in o}
+    outfits = sorted(set(outfit_of.values()))
+    masks = [m for m in body.modifiers if m.type == "MASK" and m.vertex_group.startswith("Delete.")]
+    # vertex group index -> (threshold, outfit)
+    groups = {
+        body.vertex_groups[m.vertex_group].index: (m.threshold, outfit_of[m.vertex_group[len("Delete.") :]])
+        for m in masks
     }
+    # A Mask modifier drops every face touching a masked vertex.
+    hidden_by = {
+        v.index: {groups[g.group][1] for g in v.groups if g.group in groups and g.weight > groups[g.group][0]}
+        for v in body.data.vertices
+    }
+
+    def face_outfits(face):
+        return frozenset().union(*(hidden_by[v.index] for v in face.verts))
+
     bm = bmesh.new()
-    bm.from_mesh(covered.data)
-    shown = [f for f in bm.faces if not any(v.index in masked for v in f.verts)]
-    bmesh.ops.delete(bm, geom=shown, context="FACES_ONLY")
-    bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context="VERTS")
-    bm.to_mesh(covered.data)
+    bm.from_mesh(body.data)
+    covers = {face_outfits(f) for f in bm.faces} - {frozenset()}
     bm.free()
-    print(f"Anna_BodyCovered: {len(covered.data.polygons)} faces")
-    return covered
+    for cover in covers:
+        name = "Anna_BodyCovered" if len(cover) == len(outfits) else "Anna_BodyCovered_" + "_".join(sorted(cover))
+        covered = body.copy()
+        covered.data = body.data.copy()
+        covered.name = covered.data.name = name
+        body.users_collection[0].objects.link(covered)
+        for mod in [m for m in covered.modifiers if m.type == "MASK"]:
+            covered.modifiers.remove(mod)
+        bm = bmesh.new()
+        bm.from_mesh(covered.data)
+        others = [f for f in bm.faces if face_outfits(f) != cover]
+        bmesh.ops.delete(bm, geom=others, context="FACES_ONLY")
+        bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context="VERTS")
+        bm.to_mesh(covered.data)
+        bm.free()
+        print(f"{name}: {len(covered.data.polygons)} faces")
 
 
 def main():

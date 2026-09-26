@@ -63,11 +63,13 @@ ASSETS = {
     "eyebrows": "eyebrow001.mhclo",
     "eyelashes": "eyelashes01.mhclo",
     "hair": "cortu_short_messy_hair.mhclo",
-    "clothes": [  # inner to outer
-        "mindfront_tank_top_01.mhclo",
-        "toigo_harem_pants.mhclo",
-        "toigo_leg_warmer_socks.mhclo",
-    ],
+}
+
+# Outfits, each inner to outer. All of them are fitted and exported; Godot shows
+# one at a time. The first is what she wears by default.
+OUTFITS = {
+    "home": ["mindfront_tank_top_01.mhclo", "toigo_harem_pants.mhclo", "toigo_leg_warmer_socks.mhclo"],
+    "street": ["elvs_lara_tank1.mhclo", "cortu_cargo_pants.mhclo", "joepal_crude_low_socks.mhclo"],
 }
 
 # Final object names, keyed by the MPFB asset name.
@@ -81,6 +83,9 @@ NAMES = {
     "mindfront_lusekofta": "Anna_Cardigan",
     "toigo_harem_pants": "Anna_Pants",
     "toigo_leg_warmer_socks": "Anna_Socks",
+    "elvs_lara_tank1": "Anna_BlackTop",
+    "cortu_cargo_pants": "Anna_Jeans",
+    "joepal_crude_low_socks": "Anna_BlackSocks",
 }
 
 # Texture recolouring: the asset's luminance, stretched to 0..1, is mapped onto
@@ -91,6 +96,9 @@ RECOLOR = {
     "Anna_Cardigan": [(0.0, "#e4dac4"), (0.35, "#d2c4a6"), (0.6, "#8a3b33"), (1.0, "#2c3550")],
     "Anna_Pants": [(0.0, "#5f6571"), (1.0, "#737985")],  # low contrast hides the floral print
     "Anna_Socks": [(0.0, "#a39c8e"), (1.0, "#ece6d8")],
+    "Anna_BlackTop": [(0.0, "#0d0d10"), (1.0, "#3a3a42")],
+    "Anna_Jeans": [(0.0, "#1c2940"), (0.5, "#3a5478"), (1.0, "#7390b5")],  # baggy cargo cut, denim blue
+    "Anna_BlackSocks": [(0.0, "#0d0d10"), (1.0, "#34343a")],
     "Anna_Hair": [(0.0, "#6f604a"), (0.5, "#b9a47e"), (1.0, "#e9dfc4")],  # ash blonde
     "Anna_Eyebrows": [(0.0, "#6e5231"), (1.0, "#a88557")],
 }
@@ -102,6 +110,10 @@ SMOOTH = {"Anna_Body": [(6, 0.12), (8, 0.1)]}
 
 # Decimate ratios for dense clothes; applied on export, before skinning.
 DECIMATE = {"Anna_Pants": 0.35, "Anna_Socks": 0.3}
+
+# Garments whose asset has no delete group, so the body under them isn't masked:
+# fit_delete_groups starts their group from every body vertex in their height range.
+SEED_DELETE = {"cortu_cargo_pants"}
 
 # Meshes whose texture alpha cuts out strands.
 ALPHA_CLIP = {"Anna_Hair", "Anna_Eyebrows", "Anna_Eyelashes"}
@@ -132,7 +144,8 @@ def build_human(svc, scale):
         "hair": ASSETS["hair"],
         "proxy": PROXY + ".proxy",
         "targets": [],
-        "clothes": list(ASSETS["clothes"]) + (["mindfront_lusekofta.mhclo"] if CARDIGAN else []),
+        "clothes": [c for outfit in OUTFITS.values() for c in outfit]
+        + (["mindfront_lusekofta.mhclo"] if CARDIGAN else []),
         "skin_mhmat": ASSETS["skin"],
         "skin_material_type": "MAKESKIN",
         "eyes_material_type": "MAKESKIN",
@@ -187,8 +200,12 @@ def trim(obj, keep):
 
 def trim_hidden_layers():
     """Cut away the parts of inner layers that poke through outer ones."""
-    pants_cuff = min(world_z(bpy.data.objects["Anna_Pants"]))
-    trim(bpy.data.objects["Anna_Socks"], lambda z: z < pants_cuff + 0.06)
+    for socks, pants, top in (("Anna_Socks", "Anna_Pants", None), ("Anna_BlackSocks", "Anna_Jeans", "Anna_BlackTop")):
+        pants_cuff = min(world_z(bpy.data.objects[pants]))
+        trim(bpy.data.objects[socks], lambda z: z < pants_cuff + 0.06)
+        if top:
+            top_hem = min(world_z(bpy.data.objects[top]))
+            trim(bpy.data.objects[pants], lambda z: z < top_hem + 0.03)
     if CARDIGAN:
         cardigan_hem = min(world_z(bpy.data.objects["Anna_Cardigan"]))
         # The cardigan is buttoned, so only the tank's neckline shows.
@@ -202,7 +219,8 @@ def trim_hidden_layers():
 def fit_delete_groups(body, reach=0.15):
     """Only hide the skin a garment really covers.
 
-    Each garment's `Delete.<asset>` group masks the body under it. The Mask
+    Each garment's `Delete.<asset>` group masks the body under it (SEED_DELETE
+    garments get one here). The Mask
     modifier drops every face touching a masked vertex, and the proxy body is
     coarse, so the skin can stop centimetres short of the garment's edge: with
     the tank top that leaves a see-through gap above the back neckline.
@@ -211,8 +229,12 @@ def fit_delete_groups(body, reach=0.15):
     garment within `reach` metres, and then the group is shrunk by one ring of
     edge neighbours, so the faces across the garment's edge are kept.
     """
-    assets = {v: k for k, v in NAMES.items()}
     depsgraph = bpy.context.evaluated_depsgraph_get()
+    for asset in SEED_DELETE:
+        zs = world_z(bpy.data.objects[NAMES[asset]])
+        group = body.vertex_groups.get("Delete." + asset) or body.vertex_groups.new(name="Delete." + asset)
+        seed = [v.index for v in body.data.vertices if min(zs) <= (body.matrix_world @ v.co).z <= max(zs)]
+        group.add(seed, 1.0, "REPLACE")
     for mod in body.modifiers:
         if mod.type != "MASK" or not mod.vertex_group.startswith("Delete."):
             continue
@@ -488,15 +510,34 @@ def setup_scene():
         scene.eevee.taa_render_samples = 32
 
 
+def wear(outfit):
+    """Render only outfit's clothes, and the body skin they don't cover. None renders every outfit.
+
+    Only render visibility changes, so the exports, which use viewport settings, keep every outfit.
+    """
+    body = bpy.data.objects["Anna_Body"]
+    for garments in OUTFITS.values():
+        for mhclo in garments:
+            asset = mhclo.removesuffix(".mhclo")
+            shown = outfit is None or mhclo in OUTFITS[outfit]
+            bpy.data.objects[NAMES[asset]].hide_render = not shown
+            mask = body.modifiers.get("Delete." + asset)
+            if mask:
+                mask.show_render = shown
+
+
 def render_previews(out_dir):
     scene = bpy.context.scene
     out_dir = Path(out_dir).resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
-    for cam in (o for o in scene.objects if o.type == "CAMERA"):
-        scene.camera = cam
-        scene.render.filepath = str(out_dir / f"{cam.name}.png")
-        bpy.ops.render.render(write_still=True)
-        print(f"Rendered {scene.render.filepath}")
+    for outfit in OUTFITS:
+        wear(outfit)
+        for cam in (o for o in scene.objects if o.type == "CAMERA"):
+            scene.camera = cam
+            scene.render.filepath = str(out_dir / f"{cam.name}_{outfit}.png")
+            bpy.ops.render.render(write_still=True)
+            print(f"Rendered {scene.render.filepath}")
+    wear(None)
     scene.camera = bpy.data.objects["Cam_Anna_Front"]
 
 
@@ -557,6 +598,11 @@ def main():
         if asset in NAMES:
             obj.name = NAMES[asset]
             obj.data.name = NAMES[asset]
+    for outfit, clothes in OUTFITS.items():
+        for mhclo in clothes:
+            obj = bpy.data.objects[NAMES[mhclo.removesuffix(".mhclo")]]
+            obj["outfit"] = outfit  # build_anna_animated.py splits the skin by outfit
+            obj["mpfb_asset"] = mhclo.removesuffix(".mhclo")
     restyle_materials(rig, svc)
     basemesh.data.materials.clear()
     basemesh.data.materials.append(bpy.data.materials["Anna_Body"])

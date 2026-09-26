@@ -59,14 +59,14 @@ Notes:
 - The rig is MPFB's `mixamo` skeleton: 52 bones named `mixamorig:*`, with every mesh skinned to it. The export is about 10.8k triangles in total, or 12.4k with the cardigan.
 - To change her, edit the tables at the top of the script:
   - `PHENOTYPE` holds the MakeHuman sliders.
-  - `ASSETS` holds the asset file names.
+  - `ASSETS` holds the body's asset file names, and `OUTFITS` holds her clothes. There are two outfits: `home` (red tank top, grey harem pants, cream leg-warmer socks) and `street` (black tank, baggy denim-blue cargo pants, black ankle socks). Every outfit is fitted and exported, and Godot shows one at a time. `--render` writes each camera once per outfit, as `<camera>_<outfit>.png`.
   - `RECOLOR` sets each garment's palette. The asset texture's brightness is mapped onto a gradient, so the knit and fold detail survives the colour change.
   - `SMOOTH` sets the edge-preserving blur on the skin texture. It removes the photo skin's pores and blotches, which look dirty under the cel shader, but keeps lips, nipples and ears.
   - `DECIMATE` sets how much the dense meshes are thinned.
-- Parts of inner layers that would poke through are deleted (see `trim_hidden_layers`). The body under each garment is hidden by MPFB's `Delete.*` mask. `fit_delete_groups` shrinks those masks to the skin the garment really covers, minus one ring of vertices at the edge. Without that, the coarse proxy loses whole faces past the garment's edge, which opened a hole above the tank top's back neckline. The pants waist stops just under the tank top's hem, and the socks stop just above the pants cuffs. With `--cardigan`, the tank top only shows at the neckline and the pants stop under the cardigan's hem.
+- Parts of inner layers that would poke through are deleted (see `trim_hidden_layers`). The body under each garment is hidden by MPFB's `Delete.*` mask. `fit_delete_groups` shrinks those masks to the skin the garment really covers, minus one ring of vertices at the edge. Without that, the coarse proxy loses whole faces past the garment's edge, which opened a hole above the tank top's back neckline. The pants waist stops just under the tank top's hem, and the socks stop just above the pants cuffs. The cargo pants come with no delete group, so `SEED_DELETE` makes one from the body vertices in their height range, which the same ray test then shrinks. The street tank is short and the cargo pants sit low, so a strip of midriff shows between them. With `--cardigan`, the tank top only shows at the neckline and the pants stop under the cardigan's hem.
 - Materials are image-texture → Principled BSDF. Hair, eyebrows and eyelashes export with glTF `alphaMode: MASK`.
 - There are no slippers, watch or pendant yet, and the joggers have no red side stripe.
-- License: the tank top (`mindfront_tank_top_01`) and cardigan (`mindfront_lusekofta`) are CC-BY by Mindfront, so they need a credit in the game. Everything else is CC0.
+- License: the tank top (`mindfront_tank_top_01`) and cardigan (`mindfront_lusekofta`) are CC-BY by Mindfront, and the black tank (`elvs_lara_tank1`) is CC-BY by Elvaerwyn, so they need a credit in the game. Everything else is CC0.
 
 ### Animating with Mixamo
 
@@ -88,6 +88,7 @@ Output: `blender/export/anna_animated.glb`, Anna's rig and meshes plus the anima
 
 - The Mixamo clips come with a T-pose rest while Anna's rest is an A-pose, so each bone is turned to point the same way in world space as its Mixamo twin, keeping only Anna's bone roll.
 - Root motion is removed: the hips' horizontal drift over the clip is subtracted, so walk and run play in place.
+- The skin that `Anna_Body` masks out under clothes is exported in pieces, grouped by which outfits cover it: `Anna_BodyCovered` is under every outfit, and `Anna_BodyCovered_<outfit>` is only under that one. Godot shows a piece when Anna isn't wearing an outfit that covers it.
 - The turn clips are not used yet.
 
 ## Conventions for Godot
