@@ -95,6 +95,11 @@ RECOLOR = {
     "Anna_Eyebrows": [(0.0, "#6e5231"), (1.0, "#a88557")],
 }
 
+# Skin smoothing: surface-blur passes as (radius px, threshold). A neighbour only
+# counts if it differs from the centre pixel by less than the threshold, so pores,
+# fine hair and red blotches melt away while lips, nipples and ears stay crisp.
+SMOOTH = {"Anna_Body": [(6, 0.12), (8, 0.1)]}
+
 # Decimate ratios for dense clothes; applied on export, before skinning.
 DECIMATE = {"Anna_Pants": 0.35, "Anna_Socks": 0.3}
 
@@ -279,6 +284,30 @@ def recolor_image(image, stops, name):
     return new
 
 
+def smooth_image(image, passes):
+    """Edge-preserving blur of image's pixels, in place."""
+    w, h = image.size
+    px = np.empty(w * h * 4, dtype=np.float32)
+    image.pixels.foreach_get(px)
+    px = px.reshape(h, w, 4)
+    rgb = px[..., :3]
+    for r, threshold in passes:
+        pad = np.pad(rgb, ((r, r), (r, r), (0, 0)), mode="edge")
+        acc = np.zeros_like(rgb)
+        weights = np.zeros((h, w, 1), dtype=np.float32)
+        for dy in range(-r, r + 1):
+            for dx in range(-r, r + 1):
+                if dx * dx + dy * dy > r * r:
+                    continue
+                n = pad[r + dy : r + dy + h, r + dx : r + dx + w]
+                wt = np.clip(1 - np.abs(n - rgb).max(axis=2, keepdims=True) / threshold, 0, None)
+                acc += n * wt
+                weights += wt
+        rgb = acc / weights
+    px[..., :3] = rgb
+    image.pixels.foreach_set(px.ravel())
+
+
 def save_texture(image, name):
     """Copy image into TEXTURE_DIR as <name>.png, capped at TEXTURE_SIZE."""
     # Copying a generated (recoloured) image loses its pixels, so edit those in place.
@@ -288,6 +317,8 @@ def save_texture(image, name):
     if max(w, h) > TEXTURE_SIZE:
         k = TEXTURE_SIZE / max(w, h)
         copy.scale(max(1, round(w * k)), max(1, round(h * k)))
+    if name in SMOOTH:
+        smooth_image(copy, SMOOTH[name])  # after the size cap, to keep it fast
     TEXTURE_DIR.mkdir(parents=True, exist_ok=True)
     copy.filepath_raw = str(TEXTURE_DIR / f"{name}.png")
     copy.file_format = "PNG"

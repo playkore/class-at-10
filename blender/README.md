@@ -61,6 +61,7 @@ Notes:
   - `PHENOTYPE` holds the MakeHuman sliders.
   - `ASSETS` holds the asset file names.
   - `RECOLOR` sets each garment's palette. The asset texture's brightness is mapped onto a gradient, so the knit and fold detail survives the colour change.
+  - `SMOOTH` sets the edge-preserving blur on the skin texture. It removes the photo skin's pores and blotches, which look dirty under the cel shader, but keeps lips, nipples and ears.
   - `DECIMATE` sets how much the dense meshes are thinned.
 - Parts of inner layers that would poke through are deleted (see `trim_hidden_layers`). The body under each garment is hidden by MPFB's `Delete.*` mask. `fit_delete_groups` shrinks those masks to the skin the garment really covers, minus one ring of vertices at the edge. Without that, the coarse proxy loses whole faces past the garment's edge, which opened a hole above the tank top's back neckline. The pants waist stops just under the tank top's hem, and the socks stop just above the pants cuffs. With `--cardigan`, the tank top only shows at the neckline and the pants stop under the cardigan's hem.
 - Materials are image-texture → Principled BSDF. Hair, eyebrows and eyelashes export with glTF `alphaMode: MASK`.
