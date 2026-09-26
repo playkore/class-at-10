@@ -8,10 +8,17 @@
 background_mode = 1
 background_color = Color(0.298, 0.329, 0.525, 1)
 ambient_light_source = 2
-ambient_light_color = Color(0.62, 0.64, 0.78, 1)
-ambient_light_energy = 0.5
+ambient_light_color = Color(0.84, 0.7, 0.74, 1)
+ambient_light_energy = 0.65
 tonemap_mode = 2
-ssao_enabled = true
+tonemap_exposure = 1.2
+glow_enabled = true
+glow_intensity = 0.6
+glow_bloom = 0.05
+glow_hdr_threshold = 1.1
+adjustment_enabled = true
+adjustment_brightness = 1.05
+adjustment_saturation = 1.0
 
 [node name="Main" type="Node3D"]
 script = ExtResource("1")

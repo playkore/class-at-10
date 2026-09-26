@@ -405,34 +405,44 @@ def build_outside(m):
 
 
 # --------------------------------------------------------------------------
-# Bed (foot end against the window wall) with a lumpy blanket
+# Bed along the east wall, headboard beside the desk chair, foot towards the
+# window wall, with a lumpy blanket
 # --------------------------------------------------------------------------
+
+BED_X0, BED_X1 = 2.14, 3.18  # frame; the east side touches the wall
+BED_Y0, BED_Y1 = 1.26, 3.30  # headboard back to foot end (clear of the curtain)
+
 
 def build_bed(m):
     grp = empty("Bed")
+    x0, x1, y0, y1 = BED_X0, BED_X1, BED_Y0, BED_Y1
+    cx = (x0 + x1) / 2
     mb = MeshBuilder()
-    mb.box_minmax((1.08, 1.36, 0.1), (2.12, 3.44, 0.3), m["BedWood"])
-    mb.box_minmax((1.08, 1.30, 0.0), (2.12, 1.36, 0.95), m["BedWood"])  # headboard
-    for x in (1.11, 2.09):
-        for y in (1.39, 3.41):
+    mb.box_minmax((x0, y0 + 0.06, 0.1), (x1, y1, 0.3), m["BedWood"])
+    mb.box_minmax((x0, y0, 0.0), (x1, y0 + 0.06, 0.95), m["BedWood"])  # headboard
+    for x in (x0 + 0.03, x1 - 0.03):
+        for y in (y0 + 0.09, y1 - 0.03):
             mb.box((x, y, 0.05), (0.05, 0.05, 0.1), m["BedWood"])
     mb.build("BedFrame", grp, bevel=0.01)
 
     mb = MeshBuilder()
-    mb.box_minmax((1.12, 1.38, 0.3), (2.08, 3.42, 0.5), m["Sheet"])
+    mb.box_minmax((x0 + 0.04, y0 + 0.08, 0.3), (x1 - 0.04, y1 - 0.02, 0.5), m["Sheet"])
     mb.build("Mattress", grp, bevel=0.03)
 
     mb = MeshBuilder()
     mb.box((0, 0, 0), (0.62, 0.34, 0.12), m["Pillow"])
-    mb.build("Pillow", grp, location=(1.6, 1.56, 0.57), rotation=(0.25, 0, 0), smooth=True, subdiv=2)
+    mb.build("Pillow", grp, location=(cx, y0 + 0.26, 0.57), rotation=(0.25, 0, 0), smooth=True, subdiv=2)
 
-    humps = [  # (x, y, height, sx, sy)
-        (1.22, 2.05, 0.17, 0.24, 0.30),
-        (1.88, 2.30, 0.19, 0.30, 0.36),
-        (1.45, 2.90, 0.11, 0.30, 0.26),
-        (2.00, 3.00, 0.06, 0.22, 0.25),
+    humps = [  # (dx from centre, dy from headboard, height, sx, sy)
+        (-0.38, 0.75, 0.17, 0.24, 0.30),
+        (0.28, 1.00, 0.19, 0.30, 0.36),
+        (-0.15, 1.60, 0.11, 0.30, 0.26),
+        (0.30, 1.70, 0.06, 0.22, 0.25),
     ]
-    bx0, bx1, by0, by1 = 0.93, 2.27, 1.78, 3.52
+    humps = [(cx + dx, y0 + dy, h, sx, sy) for dx, dy, h, sx, sy in humps]
+    foot = y1 - 0.02  # mattress foot edge
+    # Drapes over the open west side and the foot end; tucked against the wall
+    bx0, bx1, by0, by1 = x0 - 0.15, x1 - 0.01, y0 + 0.48, foot + 0.1
 
     def blanket(u, v):
         x = bx0 + (bx1 - bx0) * u
@@ -441,9 +451,9 @@ def build_bed(m):
         for hx, hy, h, sx, sy in humps:
             z += h * math.exp(-(((x - hx) / sx) ** 2 + ((y - hy) / sy) ** 2))
         # Drape over the mattress edges and the foot end
-        over = max(0.0, abs(x - 1.6) - 0.46)
+        over = max(0.0, abs(x - cx) - 0.46)
         z -= (over / 0.21) ** 1.4 * 0.26
-        over_y = max(0.0, y - 3.42)
+        over_y = max(0.0, y - foot)
         z -= (over_y / 0.1) ** 1.4 * 0.2
         # Loose wrinkles
         z += 0.008 * math.sin(x * 23 + y * 7) * math.sin(y * 17)
@@ -663,8 +673,8 @@ def build_desk(m):
     mb.build("VHSStack", grp, location=(2.62, 0.2, 0))
 
     mb = MeshBuilder()
-    mb.box_minmax((2.0, 0.45, 0.0), (3.1, 1.35, 0.008), m["RugBorder"])
-    mb.box_minmax((2.06, 0.51, 0.0), (3.04, 1.29, 0.01), m["Rug"])
+    mb.box_minmax((2.0, 0.45, 0.0), (3.1, 1.24, 0.008), m["RugBorder"])
+    mb.box_minmax((2.06, 0.51, 0.0), (3.04, 1.18, 0.01), m["Rug"])
     mb.build("Rug", grp)
     return grp
 
@@ -740,10 +750,11 @@ def build_cameras():
         obj.parent = grp
         return obj
 
-    bed = cam("Cam_room_bed_view", (1.6, 1.72, 0.84), 28)
-    bed.rotation_euler = (math.radians(92), 0, 0)
-    desk = cam("Cam_room_desk_view", (2.8, 2.2, 1.6), 24)
-    look_at(desk, (2.55, 0.2, 1.0))
+    # Lying on the pillow, looking past the foot of the bed at the alarm clock
+    bed = cam("Cam_room_bed_view", ((BED_X0 + BED_X1) / 2, BED_Y0 + 0.42, 0.84), 28)
+    look_at(bed, (1.75, 3.55, 0.92))
+    desk = cam("Cam_room_desk_view", (1.75, 2.3, 1.6), 24)  # standing beside the bed
+    look_at(desk, (2.6, 0.2, 0.95))
     bpy.context.scene.camera = bed
     return grp
 
