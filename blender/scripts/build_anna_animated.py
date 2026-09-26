@@ -14,10 +14,15 @@ kept. Bone lengths match, so only rotations are keyed, plus the hips location.
 
 Root motion is removed: the hips' horizontal drift from the first to the last
 frame is subtracted, so walk and run play in place and Godot moves the body.
+
+Anna_Body has the skin under her clothes masked out, so it can't poke through.
+That skin is exported as a separate mesh, Anna_BodyCovered, which Godot shows
+when she takes her clothes off.
 """
 
 from pathlib import Path
 
+import bmesh
 import bpy
 from mathutils import Matrix, Vector
 
@@ -138,8 +143,36 @@ def retarget(name, fbx, tgt, order):
     print(f"Retargeted {name}: {f1 - f0 + 1} frames")
 
 
+def add_covered_skin(body):
+    """Copy of body with only the faces its `Delete.*` masks hide."""
+    masks = [m for m in body.modifiers if m.type == "MASK" and m.vertex_group.startswith("Delete.")]
+    groups = {body.vertex_groups[m.vertex_group].index: m.threshold for m in masks}
+    covered = body.copy()
+    covered.data = body.data.copy()
+    covered.name = covered.data.name = "Anna_BodyCovered"
+    body.users_collection[0].objects.link(covered)
+    for mod in [m for m in covered.modifiers if m.type == "MASK"]:
+        covered.modifiers.remove(mod)
+
+    # A Mask modifier drops every face touching a masked vertex; keep just those.
+    masked = {
+        v.index for v in covered.data.vertices
+        if any(g.group in groups and g.weight > groups[g.group] for g in v.groups)
+    }
+    bm = bmesh.new()
+    bm.from_mesh(covered.data)
+    shown = [f for f in bm.faces if not any(v.index in masked for v in f.verts)]
+    bmesh.ops.delete(bm, geom=shown, context="FACES_ONLY")
+    bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context="VERTS")
+    bm.to_mesh(covered.data)
+    bm.free()
+    print(f"Anna_BodyCovered: {len(covered.data.polygons)} faces")
+    return covered
+
+
 def main():
     tgt = bpy.data.objects["Anna"]
+    add_covered_skin(bpy.data.objects["Anna_Body"])
     for pb in tgt.pose.bones:
         pb.matrix_basis = Matrix()
     order = bone_order(tgt)
