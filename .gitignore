@@ -22,3 +22,6 @@ tsconfig*.tsbuildinfo
 # Local env files
 *.local
 .env*
+
+# Blender backups
+*.blend1
